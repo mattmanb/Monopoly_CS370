@@ -1,0 +1,88 @@
+<diagram program="umletino" version="15.1"><zoom_level>8</zoom_level><help_text></help_text><element><id>UMLClass</id><coordinates><x>176</x><y>427</y><w>128</w><h>144</h></coordinates><panel_attributes>Player
+--
+-name: string
+-gamepiece: image
+-money: int
+-position: int
+-properties: PropertyList
+-hand: CardList
+-isBankrupt: bool
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>456</x><y>587</y><w>80</w><h>136</h></coordinates><panel_attributes>Property
+--
+-name: string
+-owner: string
+-price: int
+-rent: intList
+-mortage: int
+-houses: int
+-hotel: bool
+-isRail:bool
+-isUtil: bool</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>472</x><y>427</y><w>96</w><h>72</h></coordinates><panel_attributes>Jail
+--
+-players: string
+--
++enter(Player): void
++leave(Player): void
++paidLeave(Player): void
++escape(Player): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>576</x><y>427</y><w>176</w><h>104</h></coordinates><panel_attributes>Card Decks
+--
+-chanceDeck: cardList
+- comChestDeck: cardList
+--
++shuffle(): void
++deal(cardType): card</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>176</x><y>187</y><w>240</w><h>216</h></coordinates><panel_attributes>Game
+--
+-turnOrder: StringList
+-players: PlayerList
+-currTurn : Player
+-playerPositions: PositionList
+--
++setPlayers(): PlayerList
++setTurnOrder(Players): StringList
++changePosition(Player): void
++passGo(Player): void
++freeParking(Player): void
++goToJail(Player):void
++justVisiting(Player): void
++comChestLand(Player): void
++chanceLand(Player): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>424</x><y>187</y><w>384</w><h>160</h></coordinates><panel_attributes>Questions:
+--
+Add a boolean "inJail" under player or monitor under jail?
+Limited number of houses &amp; hotels?
+Add a boolean "isTurn" under player or monitor under board?
+Add a position "currPosition" under player or monitor under board?
+Randomness: How often to reset seed... other methods?
+Funny Theme?
+--
+Information
+--
+12 hotels and 32 houses
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>344</x><y>587</y><w>104</w><h>72</h></coordinates><panel_attributes>Card
+--
+-name: string
+-cardType: string
+-description: string</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>176</x><y>587</y><w>160</w><h>72</h></coordinates><panel_attributes>Turn
+--
++initiateTrade(PropertyList, int)
++useCard(card): void
++roll(): int
++endTurn(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>424</x><y>371</y><w>200</w><h>32</h></coordinates><panel_attributes>Board Positions
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>312</x><y>427</y><w>152</w><h>120</h></coordinates><panel_attributes>Bank
+--
+-availHouses: int
+-availHotels: int
+-availProperties: PropertyList
+--
++sellProperty(Property): void
++sellHouse(): void
++sellHotel(): void
++buyHouse(Property): void
++buyHotel(Property): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>760</x><y>427</y><w>136</w><h>72</h></coordinates><panel_attributes>Chat
+--
+-chatHist: chatMessageList
+--
++writeMsg(Player): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>760</x><y>507</y><w>80</w><h>48</h></coordinates><panel_attributes>Chat Message
+--
+-sentBy: string
+-content: string</panel_attributes><additional_attributes></additional_attributes></element></diagram>
