@@ -2,6 +2,7 @@
 --
 -name: string
 -gamepiece: image
+-position: BoardSpot
 -money: int
 -position: int
 -properties: PropertyList
@@ -53,6 +54,7 @@ Add a boolean "isTurn" under player or monitor under board?
 Add a position "currPosition" under player or monitor under board?
 Randomness: How often to reset seed... other methods?
 Funny Theme?
+Math library?
 --
 Information
 --
@@ -66,9 +68,7 @@ Information
 +initiateTrade(PropertyList, int)
 +useCard(card): void
 +roll(): int
-+endTurn(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>424</x><y>371</y><w>200</w><h>32</h></coordinates><panel_attributes>Board Positions
---
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>312</x><y>427</y><w>152</w><h>120</h></coordinates><panel_attributes>Bank
++endTurn(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>312</x><y>427</y><w>152</w><h>120</h></coordinates><panel_attributes>Bank
 --
 -availHouses: int
 -availHotels: int
