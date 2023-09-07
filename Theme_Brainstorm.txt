@@ -12,7 +12,12 @@ Monopoly Themes:
     -Suny Poly Campus
     -Music bands / Artists
     -Zoo / Animals / Bugs
-    -Space
+    -Space/Sci-fi
+    -Medival Fantasy
+    -Sports
+    -Feudal Japan
+    -Modern Architecture
+    -20th century space race/cold war
 
     Lisenced Properties
     -Bleach
@@ -29,3 +34,4 @@ Monopoly Themes:
     -Monopolyception (Monopoly themed Monopoly)
     -Computer Science (properties are iconic algorithms, milestones, products, etc.)
     -How to code Monopoly (properties are major features we implemented, player pieces are us or our discord icons, jail is 'wrote a bug', etc.)
+    -Other board game theme (The Game of Life themed Monopoly, Catan themed monopoly, etc.)
