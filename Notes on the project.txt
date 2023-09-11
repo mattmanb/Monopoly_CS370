@@ -1,0 +1,6 @@
+Possible Roles to fill in:
+•Board Design (HTML)
+•Board Design (CSS)
+•Game Functionality (JS)
+•Board Functionality (JS)
+•Online hosting and connecting
