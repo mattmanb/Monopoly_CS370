@@ -1,4 +1,4 @@
-<diagram program="umletino" version="15.1"><zoom_level>8</zoom_level><help_text></help_text><element><id>UMLClass</id><coordinates><x>176</x><y>427</y><w>128</w><h>144</h></coordinates><panel_attributes>Player
+<diagram program="umletino" version="15.1"><zoom_level>8</zoom_level><help_text></help_text><element><id>UMLClass</id><coordinates><x>176</x><y>403</y><w>128</w><h>144</h></coordinates><panel_attributes>Player
 --
 -name: string
 -gamepiece: image
@@ -8,7 +8,7 @@
 -properties: PropertyList
 -hand: CardList
 -isBankrupt: bool
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>456</x><y>587</y><w>80</w><h>136</h></coordinates><panel_attributes>Property
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>456</x><y>563</y><w>80</w><h>136</h></coordinates><panel_attributes>Property
 --
 -name: string
 -owner: string
@@ -18,20 +18,20 @@
 -houses: int
 -hotel: bool
 -isRail:bool
--isUtil: bool</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>472</x><y>427</y><w>96</w><h>72</h></coordinates><panel_attributes>Jail
+-isUtil: bool</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>472</x><y>403</y><w>96</w><h>72</h></coordinates><panel_attributes>Jail
 --
 -players: string
 --
 +enter(Player): void
 +leave(Player): void
 +paidLeave(Player): void
-+escape(Player): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>576</x><y>427</y><w>176</w><h>104</h></coordinates><panel_attributes>Card Decks
++escape(Player): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>576</x><y>403</y><w>176</w><h>104</h></coordinates><panel_attributes>Card Decks
 --
 -chanceDeck: cardList
 - comChestDeck: cardList
 --
 +shuffle(): void
-+deal(cardType): card</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>176</x><y>187</y><w>240</w><h>216</h></coordinates><panel_attributes>Game
++deal(cardType): card</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>176</x><y>163</y><w>240</w><h>216</h></coordinates><panel_attributes>Game
 --
 -turnOrder: StringList
 -players: PlayerList
@@ -46,7 +46,7 @@
 +goToJail(Player):void
 +justVisiting(Player): void
 +comChestLand(Player): void
-+chanceLand(Player): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>424</x><y>187</y><w>384</w><h>160</h></coordinates><panel_attributes>Questions:
++chanceLand(Player): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>440</x><y>3</y><w>680</w><h>392</h></coordinates><panel_attributes>Questions:
 --
 Add a boolean "inJail" under player or monitor under jail?
 Limited number of houses &amp; hotels?
@@ -59,16 +59,38 @@ Math library?
 Information
 --
 12 hotels and 32 houses
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>344</x><y>587</y><w>104</w><h>72</h></coordinates><panel_attributes>Card
+If you don't buy property from bank it gets auctioned off, starts at $10
+If monopoly (no houses), pay double the rent
+Houses can be built at any time, not just on turn
+If any property is mortgaged, can't buy houses
+Between roll and move other players can't do anything
+Num houses on property cannot exceed 1 + num houses on property with least houses
+If &gt;1 players want house or hotel, auction starting at $10
+Free parking does nothing
+Jail costs $50 to leave
+After 3 turns in jail must pay $50 and leave
+Selling house or hotel back to bank yields half the value of purchase
+Selling hotel turns it back into 4 houses
+If not enough houses to sell hotel player must sell more houses or not sell hotel
+Stil get monopoly value if properties are mortgaged
+If mortgaged property is traded new owner must unmortgage or pay diff between mortgage and unmortgage value and unmortgage later
+Players cannot give loans to one another
+--
+Bankruptcy
+--
+sell all houses and hotels, give to player owed
+give all mortgaged properties to player owed (see mortgaged property traded)
+If owing money to bank, bank auctions off all properties (unmortgaged)
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>344</x><y>563</y><w>104</w><h>72</h></coordinates><panel_attributes>Card
 --
 -name: string
 -cardType: string
--description: string</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>176</x><y>587</y><w>160</w><h>72</h></coordinates><panel_attributes>Turn
+-description: string</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>176</x><y>563</y><w>160</w><h>72</h></coordinates><panel_attributes>Turn
 --
 +initiateTrade(PropertyList, int)
 +useCard(card): void
 +roll(): int
-+endTurn(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>312</x><y>427</y><w>152</w><h>120</h></coordinates><panel_attributes>Bank
++endTurn(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>312</x><y>403</y><w>152</w><h>120</h></coordinates><panel_attributes>Bank
 --
 -availHouses: int
 -availHotels: int
@@ -78,11 +100,11 @@ Information
 +sellHouse(): void
 +sellHotel(): void
 +buyHouse(Property): void
-+buyHotel(Property): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>760</x><y>427</y><w>136</w><h>72</h></coordinates><panel_attributes>Chat
++buyHotel(Property): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>760</x><y>403</y><w>136</w><h>72</h></coordinates><panel_attributes>Chat
 --
 -chatHist: chatMessageList
 --
-+writeMsg(Player): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>760</x><y>507</y><w>80</w><h>48</h></coordinates><panel_attributes>Chat Message
++writeMsg(Player): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>760</x><y>483</y><w>80</w><h>48</h></coordinates><panel_attributes>Chat Message
 --
 -sentBy: string
 -content: string</panel_attributes><additional_attributes></additional_attributes></element></diagram>
