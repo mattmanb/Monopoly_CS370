@@ -1,0 +1,15 @@
+#chat {
+    position: relative;
+    margin-top:0px;
+    width:10%;
+    height:500px;
+    border:1px solid black;
+    overflow-y: scroll;
+    overflow-x:hidden;
+}
+.message{color:blue;}
+#chat-form {
+    position: fixed;
+    top:520px;
+    left:8px;
+}

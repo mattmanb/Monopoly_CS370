@@ -1,0 +1,10 @@
+Possible Roles to fill in:
+•Board Design (HTML)
+•Board Design (CSS)
+•Game Functionality (JS)
+•Board Functionality (JS)
+•Online hosting and connecting
+
+
+Session Tokens (who is connected, etc.; each user gets a session token)
+Store data in Cookies
