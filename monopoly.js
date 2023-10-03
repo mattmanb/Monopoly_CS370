@@ -1,71 +1,9 @@
 
-// Player class
-class player {
-    constructor(name, piece) {
-        this.name = name
-        this.piece = piece
-        this.money = 1500
-        this.currentPosition = 0
-        this.inJail = false
-        this.turnsInJail = 0
-    }
+// Need to set as type module in HTML for this to work
+import {
+    player
+} from '.classes/player.js';
 
-    setName(name) {
-        this.name = name
-        return
-    }
-
-    getName() {
-        return this.name
-    }
-
-    setPiece(piece) {
-        this.piece = piece
-        return
-    }
-
-    getPiece() {
-        return this.piece
-    }
-
-    addMoney(money) {
-        this.money += money
-        return
-    }
-
-    getMoney() {
-        return this.money
-    }
-
-    setPosition(position) {
-        this.currentPosition = position
-        return
-    }
-
-    getPosition() {
-        return this.currentPosition
-    }
-
-    setInJail(inJail) {
-        this.inJail = inJail
-        return
-    }
-
-    getInJail() {
-        return this.inJail
-    }
-
-    setTurnsInJail(turns) {
-        this.turnsInJail = turns
-        return
-    }
-
-    getTurnsInJail() {
-        return this.turnsInJail
-    }
-
-
-}
 
 /*
 function Game() {
@@ -202,4 +140,13 @@ function takeTurn(player) {
 window.onload = function() {
     game = new Game()
 }
+*/
+
+// Test stuff
+/*
+x = rollDice()
+y = rollDice()
+console.log(x + ", " + y)
+console.log("Sum: " + addDice(x, y))
+console.log("Doubles: " + isDouble(x, y))
 */
