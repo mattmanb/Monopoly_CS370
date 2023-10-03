@@ -1,2 +1,3 @@
 Theme: SUNY Poly
 Role: Board Functionality JS
+Chance cards and community chest
