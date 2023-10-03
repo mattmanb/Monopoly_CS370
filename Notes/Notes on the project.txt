@@ -1,9 +1,28 @@
+<<<<<<<<< Temporary merge branch 1:Notes on the project.txt
 Possible Roles to fill in:
 •Board Design (HTML) (Hussam & Cali)
 •Board Design (CSS) (Hussam & Cali)
 •Game Functionality (JS) (Javier)
 •Board Functionality (JS) (Brandon)
 •Online hosting and connecting (Matt)
+
+Git Steps:
+  When you want to merge your branch into the master branch, make sure to confirm some things:
+    1.) You've tested the code 
+    2.) You've pushed your work up to your origin branch (So we can all go into your branch on the origin repository and see the code)
+    3.) You've pulled down any changes from the master branch at origin
+    4.) Create a pull request to merge your branch into the master branch. (there should be a GREEN "compare and pull" button)
+    5.) Once you do so, and you've checked over your code, you can hit the Merge pull request button. I'm not sure if this is exactly will show up after you have created the pull request since         I have a setting that prevents any one person from merging to master without one other person approving. Once you try to move stuff to the master branch, let me know what you see.
+    6.) Ask some one to review your pull request and confirm the merge. Now your changes should be added to the master branch
+    7.) In our case, we will probably reuse our individual branches. Feel free to make new ones for certain features, but only keep your personal named branch.
+=========
+Possible Roles to fill in:
+•Board Design (HTML)
+•Board Design (CSS)
+•Game Functionality (JS)
+•Board Functionality (JS)
+•Online hosting and connecting
+
 
 Session Tokens (who is connected, etc.; each user gets a session token)
 Store data in Cookies
