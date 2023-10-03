@@ -53,6 +53,8 @@ document.getElementById("chat-form").addEventListener("submit", function(e) { //
 
 /*   Creating a username   */
 
+const frontEndPlayers = {}
+
 function Username() {
     var username = window.prompt("Enter your username:", "");
 
