@@ -1,4 +1,3 @@
-<<<<<<<<< Temporary merge branch 1:Notes on the project.txt
 Possible Roles to fill in:
 •Board Design (HTML) (Hussam & Cali)
 •Board Design (CSS) (Hussam & Cali)
@@ -27,12 +26,32 @@ Possible Roles to fill in:
 Session Tokens (who is connected, etc.; each user gets a session token)
 Store data in Cookies
 
-Git Steps:
-  When you want to merge your branch into the master branch, make sure to confirm some things:
-    1. You've tested the code 
-    2. You've pushed your work up to your origin branch (So we can all go into your branch on the origin repository and see the code)
-    3. You've pulled down any changes from the master branch at origin
-    4. Create a pull request to merge your branch into the master branch. (there should be a GREEN "compare and pull" button)
-    5. Once you do so, and you've checked over your code, you can hit the Merge pull request button. I'm not sure if this is exactly will show up after you have created the pull request since         I have a setting that prevents any one person from merging to master without one other person approving. Once you try to move stuff to the master branch, let me know what you see.
-    6. Ask some one to review your pull request and confirm the merge. Now your changes should be added to the master branch
-    7. In our case, we will probably reuse our individual branches. Feel free to make new ones for certain features, but only keep your personal named branch.
+
+
+MONOPOLY Notes
+- Shuffle chance and community chest cards
+- Each player gets a token (starts on go)
+- Each player gets $1500 to start (no need to have a banker)
+- 2 dice to move
+- When landing on property space, you can buy for the price
+- rent is listed on the property card
+- Every time going passed "GO" a player gets $200
+- If a player does not buy a property, it goes up for auction. 
+  players can bid on the property
+- Rolling two of the same die lets you go again. If you do this 
+  three times in a row, you go straight to jail
+- Three ways to get out of jail
+    1. Rolling double dice
+    2. $50 to the bank before rolling
+    3. Get out of jail free card (community chest or chance card)
+- If a player owns all three properties of a certain type, rent
+  is doubled
+- After owning all of a property on a street, houses can be bought
+- Houses must be split evenly; all houses must have 1 house before 
+  putting a second house on a property
+- Houses and properties can be mortgaged (no rent is paid, the bank
+  gives out the amount described, but the player must pay it back +
+  10%)
+- Once a player owes money and has no properties or other things to
+  to sell they are bankrupt, being eliminated from the game
+- Hotels are bought after 4 houses are on a property
