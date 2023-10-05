@@ -13,6 +13,29 @@ import {
     community_chest_card
 } from '.classes/community_chest_card.js'
 
+/*   Backend Connection Stuff   */
+var socket = io()
+
+socket.on('updatePlayers', (backEndPlayers) => {
+    for(const id in backEndPlayers) {
+        const backEndPlayer = backEndPlayers[id]
+
+        if(!frontEndPlayers[id]) { //if there isn't a front end player with this back end player's id, add a new one
+            frontEndPlayers[id] = new player({
+                name: backEndPlayer.name,
+                piece: backEndPlayer.piece,
+                money: backEndPlayer.money,
+                position: backEndPlayer.position,
+                inJail: backEndPlayer.inJail,
+                turnsInJail: backEndPlayer.turnsInJail
+            })
+        }
+        else {
+            if(id === socket.id) //if the player already exists, we need to update their position
+        }
+    }
+})
+
 // we'll need a shuffle community cards
 // and a shuffle chance cards
 
