@@ -60,7 +60,7 @@ function getUsername() {
 
 setInterval(() => {
     io.emit('updatePlayers', backEndPlayers)
-}, 1000)
+}, 15)
 
 //listen on the port
 
