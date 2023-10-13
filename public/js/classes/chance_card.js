@@ -1,4 +1,4 @@
 // chance card class
-export class chance_card {
+class chance_card {
     
 }

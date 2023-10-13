@@ -1,20 +1,10 @@
 
 // Need to set as type module in HTML for this to work
-import {
-    player
-} from '.classes/player.js';
-import {
-    property
-} from '.classes/property.js'
-import {
-    chance_card
-} from '.classes/chance_card.js'
-import {
-    community_chest_card
-} from '.classes/community_chest_card.js'
+
 
 /*   Backend Connection Stuff   */
 var socket = io()
+const frontEndPlayers = {}
 
 socket.on('updatePlayers', (backEndPlayers) => {
     for(const id in backEndPlayers) {
@@ -31,7 +21,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
             })
         }
         else {
-            if(id === socket.id) //if the player already exists, we need to update their position
+            if(id === socket.id) //if the player already exists, we need to update their position 
+            {
+                frontEndPlayers[id].position = backEndPlayer.position
+            }
         }
     }
 })

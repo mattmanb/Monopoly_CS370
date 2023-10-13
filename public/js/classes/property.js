@@ -1,6 +1,6 @@
 // property class
 
-export class property { //color to be implemented in street.js
+class property { //color to be implemented in street.js
     constructor({ name, price, rent, houseCost, mortgage }) {
         this.name = name;
         this.price = price;
