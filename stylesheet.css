@@ -1,0 +1,12 @@
+h1 {
+  color: black;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.startButton {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}/*# sourceMappingURL=stylesheet.css.map */
