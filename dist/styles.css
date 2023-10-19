@@ -75,7 +75,7 @@ h6 {
 .center {
   grid-column: 2/11;
   grid-row: 2/11;
-  background: rgb(226, 245, 214);
+  background: #fafaf8;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(7, 1fr);
@@ -119,20 +119,7 @@ h6 {
   width: 160px;
   height: 120px;
 }
-/*
-.deck .chanced{
-  border: 2px dashed #080808;
-  width: 160px;
-  height: 120px;
-  background-color: orange;
-}
-.deck .communityd{
-    border: 2px dashed #080808;
-    width: 160px;
-    height: 120px;
-    background-color: lightyellow;
-  } working on these two for background colors of cards
-*/
+
 .row {
   display: grid;
   grid-gap: 2px;
@@ -182,7 +169,7 @@ h6 {
 }
 
 .space {
-  background: rgb(246, 248, 246);
+  background: #fafaf8;
   text-align: center;
 }
 .space .container {
@@ -222,6 +209,14 @@ h6 {
   padding-bottom: 50px;
 }
 
+.railroad .name {
+  padding-top: 10px;
+}
+.railroad .drawing {
+  font-size: 60px;
+  color: #080808;
+}
+
 .utility .name {
   padding-top: 10px;
 }
@@ -251,10 +246,17 @@ h6 {
 }
 .go .go-word {
   font-size: 60px;
-  color: #c0041d;
+  color: #f50c2b;
+}
+.go .arrow {
+  font-size: 45px;
+  color: #f50c2b;
+  position: absolute;
+  bottom: -10px;
+  left: 5px;
 }
 
-.CC {
+.jail {
   grid-column: 1;
   grid-row: 11/12;
   display: grid;
@@ -263,71 +265,86 @@ h6 {
   justify-content: center;
   align-items: center;
 }
-.CC .drawing {
+.jail .drawing {
   grid-column: 4/11;
   grid-row: 1/8;
   width: 90px;
   height: 90px;
-  background: #d65c15;
+  background: #2f1dfa;
   border-bottom: 2px solid #080808;
   border-left: 2px solid #080808;
 }
-.CC .just {
+.jail .just {
   grid-column: 3;
   grid-row: 4;
   transform: rotate(90deg);
   padding-top: 5px;
 }
-.CC .visiting {
+.jail .visiting {
   grid-column: 6;
   grid-row: 8;
   padding-top: 5px;
 }
-.CC .container {
+.jail .container {
   align-items: center;
   transform: rotate(45deg);
 }
-.CC .name {
+.jail .name {
   font-size: 14px;
 }
-
-.CC .person {
+.jail .window {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: relative;
+  width: 55px;
+  height: 55px;
+  background: #fafaf8;
+  border: 2px solid #080808;
+}
+.jail .person {
   position: absolute;
   transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
   font-size: 40px;
 }
-.SC {
+.jail .bar {
+  height: 55px;
+  width: 2px;
+  background: #080808;
+}
+
+.free-parking {
   grid-column: 1;
   grid-row: 1/2;
 }
-.SC .container {
+.free-parking .container {
   justify-content: center;
   transform: rotate(135deg);
 }
-.SC .name {
+.free-parking .name {
   font-size: 16px;
 }
-.SC .drawing {
+.free-parking .drawing {
   font-size: 60px;
   color: #f50c2b;
   padding-top: 5px;
   padding-bottom: 5px;
 }
 
-.go-to-CC {
+.go-to-jail {
   grid-column: 11;
   grid-row: 1/1;
 }
-.go-to-CC .container {
+.go-to-jail .container {
   justify-content: center;
   transform: rotate(225deg);
 }
-.go-to-CC .name {
+.go-to-jail .name {
   font-size: 16px;
 }
-.go-to-CC .drawing {
+.go-to-jail .drawing {
   font-size: 60px;
   color: #640303;
   padding-top: 5px;
@@ -341,13 +358,27 @@ h6 {
   font-size: 90px;
   color: #f50c2b;
 }
+.chance .blue {
+  color: #5a6dba;
+}
 
 .community-chest .container {
   justify-content: space-around;
 }
-
+.community-chest .drawing {
+  font-size: 50px;
+  color: #d2eaf5;
+}
 .community-chest .instructions {
   font-size: 8px;
+}
+
+.electric-company .drawing {
+  color: #ffed20;
+}
+
+.waterworks .drawing {
+  color: #5a6dba;
 }
 
 .income-tax .container {
@@ -357,13 +388,23 @@ h6 {
 .income-tax .name {
   padding-bottom: 5px;
 }
-
 .income-tax .diamond {
   width: 5px;
   height: 5px;
   background: #080808;
   transform: rotate(45deg);
   display: inline-block;
+}
+.income-tax .instructions {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.luxury-tax .drawing {
+  font-size: 50px;
+}
+.luxury-tax .instructions {
+  padding-bottom: 5px;
 }
 
 .long-name {
@@ -380,24 +421,4 @@ h6 {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.pill {
-  font-size: 20px;
-  padding: 0.5em, 1em;
-  margin: 0.25em;
-  border-radius: 1em;
-  border: none;
-  outline: none;
-  background: #dddddd;
-  cursor: pointer;
-}
-.pill--selected {
-  background-color: #009578;
-  color: white;
-}
-
-.pill--selected:hover {
-  background-color: rgb(204, 253, 204);
-  color: black;
 }
