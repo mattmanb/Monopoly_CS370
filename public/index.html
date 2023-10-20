@@ -31,13 +31,6 @@
                 border-radius: 50%;
             }
         </style>
-        <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-        <script src="./js/classes/chance_card.js"></script>
-        <script src="./js/classes/community_chest_card.js"></script>
-        <script src="./js/classes/player.js"></script>
-        <script src="./js/classes/property.js"></script>
-        <script src="./js/classes/street.js"></script>
-        <script src="./js/monopoly.js"></script>
     </head>
     <body>
         <div id ="table">
@@ -46,10 +39,16 @@
                 <div id="2" class="board-piece"></div>
             </div>
             <div class="table-row">
-                <div id="3" class="board-piece"></div>
                 <div id="4" class="board-piece"></div>
+                <div id="3" class="board-piece"></div>
             </div>
         </div>
-        <button id="dice" onclick="movePlayer(1, this)">Move Player</button>
+        <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+        <script src="./js/classes/chance_card.js"></script>
+        <script src="./js/classes/community_chest_card.js"></script>
+        <script src="./js/classes/player.js"></script>
+        <script src="./js/classes/property.js"></script>
+        <script src="./js/classes/street.js"></script>
+        <script src="./js/monopoly.js"></script>
     </body>
 </html>

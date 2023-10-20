@@ -1,10 +1,12 @@
-
-// Need to set as type module in HTML for this to work
-
-
 /*   Backend Connection Stuff   */
-var socket = io()
-const frontEndPlayers = {}
+var socket = io() // socket object represents the player on THIS front end
+const frontEndPlayers = {} //this is a list of all the player for THIS front end
+
+const one = document.getElementById('1');
+const two = document.getElementById('2');
+const three = document.getElementById('3');
+const four = document.getElementById('4');
+const circle = document.getElementById('player');
 
 socket.on('updatePlayers', (backEndPlayers) => {
     for(const id in backEndPlayers) {
@@ -27,6 +29,18 @@ socket.on('updatePlayers', (backEndPlayers) => {
             }
         }
     }
+})
+
+socket.on('moveDot', (pos) => {
+    frontEndPlayers[socket.id].position = pos
+    if(pos == 0) { one.appendChild(circle) }
+    else if(pos == 1) { two.appendChild(circle) }
+    else if (pos == 2) { three.appendChild(circle) }
+    else { four.appendChild(circle) }
+})
+
+window.addEventListener('keydown', (event) => {
+    socket.emit('keydown')
 })
 
 // we'll need a shuffle community cards
@@ -182,7 +196,7 @@ console.log("Doubles: " + isDouble(x, y))
 
 // We will change names to Monopolytechnic later... :-)
 
-board = [] //For now, assuming the board is a list of property spaces where the index is the position
+const board = [] //For now, assuming the board is a list of property spaces where the index is the position
 
 board[1] = new property({
     name:"Mediterranean Avenue", 
