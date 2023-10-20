@@ -1,54 +1,22 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Monopolytechnic</title>
-        <style>
-            html {
-                background-color: black;
-                align-items: center;
-            }
-            .board-piece {
-                width:250px;
-                height:250px;
-                border: 1px solid cyan;
-                display: table-cell;
-                align-content: center;
-            }
-            #table {
-                display:table;
-                align-items: center;
-            }
-            .table-row {
-                display:table-row;
-            }
-            #player {
-                position: relative;
-                left:30%;
-                top:30%;
-                height:100px;
-                width:100px;
-                background-color: #0FFF50;
-                border-radius: 50%;
-            }
-        </style>
-    </head>
-    <body>
-        <div id ="table">
-            <div class ="table-row">
-                <div id="1" class="board-piece"><div id="player"></div></div>
-                <div id="2" class="board-piece"></div>
-            </div>
-            <div class="table-row">
-                <div id="4" class="board-piece"></div>
-                <div id="3" class="board-piece"></div>
-            </div>
-        </div>
-        <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-        <script src="./js/classes/chance_card.js"></script>
-        <script src="./js/classes/community_chest_card.js"></script>
-        <script src="./js/classes/player.js"></script>
-        <script src="./js/classes/property.js"></script>
-        <script src="./js/classes/street.js"></script>
-        <script src="./js/monopoly.js"></script>
-    </body>
+
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="stylesheet.css" />
+  </head>
+  <title>MONOPOLYTECH</title>
+
+  <body>
+    <h1>MONOPOLYTECHNIC</h1>
+    <div class="pillDiv">
+      <a href="board.html">
+        <button class="pill pill--selected" type="button">Start Game</button>
+      </a>
+    </div>
+    <div class="pillDiv">
+      <a href="options.html">
+        <button class="pill" type="button">Options</button>
+      </a>
+    </div>
+  </body>
 </html>
