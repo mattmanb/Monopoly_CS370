@@ -2,17 +2,17 @@
 //express server
 const express = require('express')
 const app = express() //here is the express server
-console.log("express app Started.")
 
 //http server
 const http = require('http')
 const server = http.createServer(app) //creates http server wrapped around express server
-console.log("http server Started.")
 
 //Socket.io server
 const { Server } = require('socket.io')
-const io = new Server(server, { pingInterval:2000, pingTimeout:5000 }) //socket.io server wrapped around http server wrapped around express server (say that 10 times fast)
-console.log("socket.io server Started.")
+const io = new Server(server, { 
+    pingInterval:2000, 
+    pingTimeout:5000
+}) //socket.io server wrapped around http server wrapped around express server (say that 10 times fast)
 /*   End Server setup   */
 
 const port = 3000 //changable later
@@ -44,15 +44,7 @@ io.on('connection', (socket) => {
         delete backEndPlayers[socket.id]
         io.emit('updatePlayers', backEndPlayers)
     })
-
-    socket.on('keydown', () => {
-        if(backEndPlayers[socket.id].position == 3) {
-            backEndPlayers[socket.id].position = 0;
-        } else {
-            backEndPlayers[socket.id].position += 1
-        }
-        socket.emit('moveDot', backEndPlayers[socket.id].position)
-    })
+    
     console.log(backEndPlayers)
 })
 

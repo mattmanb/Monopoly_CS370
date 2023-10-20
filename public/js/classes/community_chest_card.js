@@ -1,4 +1,4 @@
 // community chest class
-class community_chest_card {
+export class community_chest_card {
 
 }

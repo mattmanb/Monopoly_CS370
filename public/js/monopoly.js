@@ -1,17 +1,15 @@
+// import socket IO
+import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
+
+// socket is the player connection
+const socket = io(); 
+
 
 // Need to set as type module in HTML for this to work
-import {
-    player
-} from './classes/player.js';
-import {
-    property
-} from './classes/property.js'
-import {
-    chance_card
-} from './classes/chance_card.js'
-import {
-    community_chest_card
-} from './classes/community_chest_card.js'
+import { player } from './classes/player.js';
+import { property } from './classes/property.js'
+import { chance_card } from './classes/chance_card.js'
+import { community_chest_card } from './classes/community_chest_card.js'
 
 // we'll need a shuffle community cards
 // and a shuffle chance cards
