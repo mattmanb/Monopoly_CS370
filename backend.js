@@ -44,6 +44,16 @@ io.on('connection', (socket) => {
         delete backEndPlayers[socket.id]
         io.emit('updatePlayers', backEndPlayers)
     })
+
+    socket.on('keydown', () => {
+        if(backEndPlayers[socket.id].position == 3) {
+            backEndPlayers[socket.id].position = 0;
+        } else {
+            backEndPlayers[socket.id].position += 1
+        }
+        socket.emit('moveDot', backEndPlayers[socket.id].position)
+    })
+    console.log(backEndPlayers)
 })
 
 function getUsername() {
@@ -57,6 +67,10 @@ function getUsername() {
         getUsername();
     }
 }
+
+io.on('keydown', () => {
+    console.log('keydown on backend!');
+})
 
 setInterval(() => {
     io.emit('updatePlayers', backEndPlayers)
