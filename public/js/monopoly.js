@@ -2,16 +2,16 @@
 // Need to set as type module in HTML for this to work
 import {
     player
-} from '.classes/player.js';
+} from './classes/player.js';
 import {
     property
-} from '.classes/property.js'
+} from './classes/property.js'
 import {
     chance_card
-} from '.classes/chance_card.js'
+} from './classes/chance_card.js'
 import {
     community_chest_card
-} from '.classes/community_chest_card.js'
+} from './classes/community_chest_card.js'
 
 // we'll need a shuffle community cards
 // and a shuffle chance cards
@@ -24,7 +24,7 @@ function Game() {
 
 // Roll dice, return value from 1-6
 function rollDice() {
-    dice = Math.floor(Math.random() * 6) + 1
+    var dice = Math.floor(Math.random() * 6) + 1
     return dice
 }
 
@@ -46,26 +46,28 @@ function isDouble(dice1, dice2) {
 // if passing GO, player collects $200
 function movePlayer(numSpaces, player) {
     player.setPosition(player.getPosition() + numSpaces)
-    if (player.getPosition() >= 40)
-        player.setPosition(player.getPosition - 40)
+    if (player.getPosition() >= 40) {
+        player.setPosition(player.getPosition() - 40)
         player.addMoney(200)
+        console.log("Pass GO, collect 200!")
+    }
     return
 }
 
 function rollAndMove(player) {
 
-    numDoubles = 0
+    var numDoubles = 0
 
     // While loop ends if player ends up in jail during there turn
     // Can happen from 3 doubles, go to jail space, or chance card
     while (!player.inJail) {
 
         // Roll 2 dice
-        dice1 = rollDice()
-        dice2 = rollDice()
+        var dice1 = rollDice()
+        var dice2 = rollDice()
 
         // Check if dice were doubles
-        rolledDoubles = isDouble(dice1,dice2)
+        var rolledDoubles = isDouble(dice1,dice2)
         if (rolledDoubles) {
 
             // If yes, increment numDoubles
@@ -77,13 +79,14 @@ function rollAndMove(player) {
                 return
             }
         }
-
         // Add dice rolls and move player that many spaces
-        diceTotal = addDice(dice1, dice2)
+        var diceTotal = addDice(dice1, dice2)
+        console.log(player.name + " rolled " + diceTotal.toString() + ". Doubles: " + rolledDoubles.toString())
         movePlayer(diceTotal, player)
+        console.log("Player position: " + player1.getPosition().toString())
 
         // Land on that space and do appropriate action
-        landOnSpace(player.getPosition())
+        landOnSpace(player)
 
         // If dice are not doubles, exit function
         if (!rolledDoubles) {
@@ -123,7 +126,9 @@ function attemptJailLeave(player) {
     return
 }
 
-function landOnSpace(currentPosition) {
+function landOnSpace(player) {
+
+    let space = player.getPosition()
 
     // Will employ some kind of switch function here to determine what to do
     // Property: check owner
@@ -133,6 +138,34 @@ function landOnSpace(currentPosition) {
     // GO, Just Visiting, or Free Parking: Do nothing
     // Chance or Community Chest: draw card, perform appropriate action
     // Income or Luxury Tax: Pay appropriate amount
+
+    if (board[space] instanceof property) {
+
+        if (board[space].owner == null) {
+
+            if (player.getMoney() >= board[space].price) {
+
+                let choice = confirm("Would you like to buy " + board[space].name + " for " + board[space].price.toString() + "?")
+                if (choice) {
+
+                    board[space].owner = player
+                    player.addMoney(-1 * board[space].price)
+                    console.log(board[space].name + " is now owned by " + player.getName())
+                    console.log(player.getName() + " now has " + player.getMoney().toString())
+                }
+                else {
+                    console.log(player.getName() + " has chosen not to buy " + board[space].name)
+                }
+            }
+            else {
+                console.log(player.getName() + " doesn't have enough money.")
+            }
+        }
+        else {
+            console.log(player.getName() + " pays " + board[space].owner.getName() + " " + board[space].price.toString() + ".")
+        }
+    }
+
 
 }
 
@@ -153,20 +186,11 @@ window.onload = function() {
 }
 */
 
-// Test stuff
-/*
-x = rollDice()
-y = rollDice()
-console.log(x + ", " + y)
-console.log("Sum: " + addDice(x, y))
-console.log("Doubles: " + isDouble(x, y))
-*/
-
 //Init all properties, no railroads or utilities
 
 // We will change names to Monopolytechnic later... :-)
 
-board = [] //For now, assuming the board is a list of property spaces where the index is the position
+let board = [] //For now, assuming the board is a list of property spaces where the index is the position
 
 board[1] = new property({
     name:"Mediterranean Avenue", 
@@ -300,3 +324,20 @@ board[39] = new property({
     rent:[50, 200, 600, 1400, 1700, 2000], 
     houseCost:200,
     mortgage:200 });
+
+// Test stuff
+/*
+x = rollDice()
+y = rollDice()
+console.log(x + ", " + y)
+console.log("Sum: " + addDice(x, y))
+console.log("Doubles: " + isDouble(x, y))
+
+let player1 = new player("Javier", "car")
+console.log(player1.getName() + " has " + player1.getMoney().toString())
+var i
+for (i = 0 ; i < 6 ; i++) {
+    rollAndMove(player1)
+    console.log(player1.getName() + " has " + player1.getMoney().toString())
+}
+*/
