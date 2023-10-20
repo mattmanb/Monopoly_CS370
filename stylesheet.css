@@ -1,0 +1,38 @@
+h1 {
+  color: black;
+  text-align: center;
+  font-family: sans-serif;
+  font-size: 50px;
+}
+
+.pillDiv {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pill {
+  font-size: 20px;
+  padding: 0.5em, 1em;
+  margin: 0.25em;
+  border-radius: 1em;
+  border: none;
+  outline: none;
+  background: #dddddd;
+  cursor: pointer;
+}
+
+.pill:not(.pill--selected):hover {
+  background-color: #cccccc;
+}
+
+.pill--selected {
+  background-color: #009578;
+  color: white;
+}
+
+.pill--selected:hover {
+  background-color: rgb(204, 253, 204);
+  color: black;
+}
