@@ -3,21 +3,66 @@
 <html lang="en">
   <head>
     <link rel="stylesheet" href="stylesheet.css" />
+    <style>
+      /* Define the player display container */
+      .player-container {
+          display: flex;
+          flex-wrap: wrap;
+          width: 500px; /* Adjust the width as needed */
+      }
+
+      /* Define the player box style */
+      .player-box {
+          width: 100px; /* Adjust the width as needed */
+          height: 100px; /* Adjust the height as needed */
+          background-color: #3498db; /* Default background color */
+          margin: 10px; /* Adjust the margin as needed */
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: #fff; /* Text color */
+          font-weight: bold;
+      }
+
+      /* Add more styles for individual players as needed */
+    </style>
   </head>
   <title>MONOPOLYTECH</title>
 
   <body>
     <h1>MONOPOLYTECHNIC</h1>
     <div class="pillDiv">
-      <a href="board.html">
+      <a href="http://localhost:3000/play"> <!--Need to switch this to the website we host on later-->
         <button class="pill pill--selected" type="button">Start Game</button>
       </a>
     </div>
     <div class="pillDiv">
-      <a href="options.html">
+      <a href="http://localhost:3000/options">
         <button class="pill" type="button">Options</button>
       </a>
     </div>
     <script type="module" src="./js/monopoly.js"></script>
+    <h1>Player Display</h1>
+    <div class="player-container">
+        <!-- Player 1 Box -->
+        <div class="player-box" id="1">Player 1</div>
+        <!-- Player 2 Box -->
+        <div class="player-box" id="2">Player 2</div>
+        <!-- Player 3 Box -->
+        <div class="player-box" id="3">Player 3</div>
+        <!-- Player 4 Box -->
+        <div class="player-box" id="4">Player 4</div>
+        <!-- Player 5 Box -->
+        <div class="player-box" id="5">Player 5</div>
+        <!-- Player 6 Box -->
+        <div class="player-box" id="6">Player 6</div>
+        <!-- Player 7 Box -->
+        <div class="player-box" id="7">Player 7</div>
+        <!-- Player 8 Box -->
+        <div class="player-box" id="8">Player 8</div>
+    </div>
+  
+  
+  
   </body>
 </html>

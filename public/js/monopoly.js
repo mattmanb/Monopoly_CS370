@@ -4,12 +4,82 @@ import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
 // socket is the player connection
 const socket = io(); 
 
-
 // Need to set as type module in HTML for this to work
 import { player } from './classes/player.js';
 import { property } from './classes/property.js'
 import { chance_card } from './classes/chance_card.js'
 import { community_chest_card } from './classes/community_chest_card.js'
+
+const frontEndPlayers = {}; //dictionary of players who connect (socket.id is the key for each player)
+var frontEndPieces = [];
+
+socket.on('updatePlayers', (backEndPlayers) => {
+    for (const id in backEndPlayers) { //update frontEndPlayers
+        const backEndPlayer = backEndPlayers[id];
+        if(!frontEndPlayers[id]) {
+            var username = "barlav"//getUsername();
+            var piece = "Thimble"//getPiece();
+            frontEndPlayers[id] = new player({
+                name: username,
+                piece: piece,
+                playerNumber: backEndPlayer.playerNumber
+            })
+            socket.emit('new-user-data', { username, piece });
+            console.log("NEW PLAYER:", frontEndPlayers[id]);
+        } else {
+            if(id === socket.id) {
+                frontEndPlayers[id].currentPosition = backEndPlayer.currentPosition;
+                document.getElementById(frontEndPlayers[id].playerNumber.toString()).style.backgroundColor = "green";
+            } else {
+                document.getElementById(frontEndPlayers[id].playerNumber.toString()).style.backgroundColor = "red";
+            }
+        }
+        for(const id in frontEndPlayers) {
+            if(!backEndPlayers[id]) {
+                delete frontEndPlayers[id];
+            }
+        }
+    }
+    //console.log(frontEndPlayers);
+});
+
+// updates the front end pieces 
+socket.on('pieces-list', (backEndPieces) => {
+    frontEndPieces = [...backEndPieces];
+})
+
+function getUsername() {
+    var username = prompt('Please enter your username:');
+
+    if(username===null || username.length < 3) {
+        alert('Your username must be at least three characters.');
+        return;
+    }
+
+    return username;
+}
+
+function getPiece() {
+    
+    var prompt_message = "Choose a piece: ";
+    var ind = 0;
+    
+    for(const piece in frontEndPieces) {
+        prompt_message += ("(" + (ind + 1) + ": " + frontEndPieces[ind] + ") ");
+        ind++;
+    }
+    const piece_ind = prompt(prompt_message);
+    if(piece_ind < 1 || piece_ind > frontEndPieces.length) {
+        alert("Incorrect entry, try again.");
+        console.log("front end pieces bound error", frontEndPieces);
+        return getPiece();
+    } else {
+        var validPiece = frontEndPieces[piece_ind - 1];
+        frontEndPieces.splice(piece_ind-1, 1);
+        socket.emit('update-pieces', frontEndPieces);
+        return validPiece;
+    }
+}
 
 // we'll need a shuffle community cards
 // and a shuffle chance cards
