@@ -42,44 +42,51 @@ var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
 
 io.on('connection', (socket) => {
     console.log('a user connected');
-    socket.emit('pieces-list', backEndPieces);
-    backEndPlayers[socket.id] = {
-        name: null,
-        piece: null,
-        money: 1500,
-        position: 0,
-        inJail: false,
-        turnsInJail: 0,
-        playerNumber: Math.min(...availablePlayers)//NEED THIS VALUE TO BE THE LOWEST NUMBER BETWEEN 1 AND 8 THAT ISN'T ALREADY A PLAYERNUMBER
-    };
+    if(availablePlayers.length > 0) {
+        socket.emit('pieces-list', backEndPieces);
+        backEndPlayers[socket.id] = {
+            name: null,
+            piece: null,
+            money: 1500,
+            position: 0,
+            inJail: false,
+            turnsInJail: 0,
+            playerNumber: Math.min(...availablePlayers)//NEED THIS VALUE TO BE THE LOWEST NUMBER BETWEEN 1 AND 8 THAT ISN'T ALREADY A PLAYERNUMBER
+        };
 
-    const pNindex = availablePlayers.indexOf(backEndPlayers[socket.id].playerNumber);
-    availablePlayers.splice(pNindex, 1);
+        const pNindex = availablePlayers.indexOf(backEndPlayers[socket.id].playerNumber);
+        availablePlayers.splice(pNindex, 1);
 
-    io.emit('updatePlayers', backEndPlayers); //emit to the front end; a new player joined
+        io.emit('updatePlayers', backEndPlayers); //emit to the front end; a new player joined
 
-    socket.on('disconnect', (reason) => {
-        console.log("disconnected...", reason);
-        availablePlayers.push(backEndPlayers[socket.id].playerNumber);
-        console.log(availablePlayers);
-        delete backEndPlayers[socket.id];
-        io.emit('update-connected-players', availablePlayers);
-        io.emit('updatePlayers', backEndPlayers);
-    })
+        socket.on('disconnect', (reason) => {
+            console.log("disconnected...", reason);
+            availablePlayers.push(backEndPlayers[socket.id].playerNumber);
+            console.log(availablePlayers);
+            delete backEndPlayers[socket.id];
+            io.emit('update-connected-players', availablePlayers);
+            io.emit('updatePlayers', backEndPlayers);
+        })
 
-    socket.on('new-user-data', (userData) => {
-        backEndPlayers[socket.id].name = userData.username;
-        backEndPlayers[socket.id].piece = userData.piece;
-    })
+        socket.on('new-user-data', (userData) => {
+            console.log("New user data:", userData);
+            backEndPlayers[socket.id].name = userData.username;
+            console.log(userData.selectedPiece)
+            backEndPlayers[socket.id].piece = userData.selectedPiece;
+            console.log(backEndPlayers);
+        })
 
-    // front end request that a piece was taken
-    socket.on('update-pieces', (frontEndPieces) => {
-        backEndPieces = [...frontEndPieces];
-        console.log("backend pieces updated!", backEndPieces);
-        io.emit('pieces-list', (backEndPieces));
-    })
+        // front end request that a piece was taken
+        socket.on('update-pieces', (frontEndPieces) => {
+            backEndPieces = [...frontEndPieces];
+            console.log("backend pieces updated!", backEndPieces);
+            io.emit('pieces-list', (backEndPieces));
+        })
 
-    console.log(backEndPlayers);
+        console.log(backEndPlayers);
+    } else {
+        console.log("Max players in lobby.");
+    }
 });
 
 setInterval(() => {

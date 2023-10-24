@@ -17,19 +17,50 @@ socket.on('updatePlayers', (backEndPlayers) => {
     for (const id in backEndPlayers) { //update frontEndPlayers
         const backEndPlayer = backEndPlayers[id];
         if(!frontEndPlayers[id]) {
-            var username = "barlav"//getUsername();
-            var piece = "Thimble"//getPiece();
-            frontEndPlayers[id] = new player({
-                name: username,
-                piece: piece,
+            frontEndPlayers[id] = new player({ 
                 playerNumber: backEndPlayer.playerNumber
             })
-            socket.emit('new-user-data', { username, piece });
             console.log("NEW PLAYER:", frontEndPlayers[id]);
         } else {
-            if(id === socket.id) {
-                //frontEndPlayers[id].currentPosition = backEndPlayer.currentPosition;
-                document.getElementById((frontEndPlayers[id].playerNumber).toString()).style.backgroundColor = "green";
+            if(id === socket.id) { //all this stuff is the username and piece entry
+                $(() => {
+                    var id = (frontEndPlayers[socket.id].playerNumber).toString();
+                    const $playerContainer = $("#" + id);
+                    $($playerContainer).css("background-color", 'green');
+                    if($playerContainer.find("form").length === 0) {
+                        //creates the form for a player to enter username and piece
+                        const form = $("<form>");
+
+                        const usernameLabel = $("<label>").text("Username: ");
+                        const usernameInput = $("<input>").attr("type", "text").attr("name", "username");
+
+                        const pieceLabel = $("<label>").text("Choose your piece: ");
+                        const pieceSelect = $("<select>").attr("name", "piece");
+
+                        $.each(frontEndPieces, function(index, value) {
+                            pieceSelect.append($("<option>").attr("value", value).text(value));
+                        })
+
+                        const submitButton = $("<input>").attr("type", "submit").val("Submit");
+
+                        form.append(usernameLabel, usernameInput, pieceLabel, pieceSelect, submitButton);
+
+                        $playerContainer.append(form);
+                        
+                        form.on("submit", (event) => {
+                            event.preventDefault();
+
+                            const username = usernameInput.val();
+                            const selectedPiece = pieceSelect.val();
+                            frontEndPieces.splice(frontEndPieces.indexOf(selectedPiece), 1);
+                            socket.emit('update-pieces', frontEndPieces);
+
+                            socket.emit('new-user-data', { username, selectedPiece })
+
+                            alert(`Username: ${username}\nPiece: ${selectedPiece}`);
+                        })
+                    }
+                })                
             } else {
                 document.getElementById((frontEndPlayers[id].playerNumber).toString()).style.backgroundColor = "red";
             }
@@ -55,39 +86,6 @@ socket.on('update-connected-players', (unconnected_players) => {
         document.getElementById(realID).style.backgroundColor = "#3498db";
     }
 })
-
-function getUsername() {
-    var username = prompt('Please enter your username:');
-
-    if(username===null || username.length < 3) {
-        alert('Your username must be at least three characters.');
-        return;
-    }
-
-    return username;
-}
-
-function getPiece() {
-    
-    var prompt_message = "Choose a piece: ";
-    var ind = 0;
-    
-    for(const piece in frontEndPieces) {
-        prompt_message += ("(" + (ind + 1) + ": " + frontEndPieces[ind] + ") ");
-        ind++;
-    }
-    const piece_ind = prompt(prompt_message);
-    if(piece_ind < 1 || piece_ind > frontEndPieces.length) {
-        alert("Incorrect entry, try again.");
-        console.log("front end pieces bound error", frontEndPieces);
-        return getPiece();
-    } else {
-        var validPiece = frontEndPieces[piece_ind - 1];
-        frontEndPieces.splice(piece_ind-1, 1);
-        socket.emit('update-pieces', frontEndPieces);
-        return validPiece;
-    }
-}
 
 // we'll need a shuffle community cards
 // and a shuffle chance cards
