@@ -28,10 +28,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
             console.log("NEW PLAYER:", frontEndPlayers[id]);
         } else {
             if(id === socket.id) {
-                frontEndPlayers[id].currentPosition = backEndPlayer.currentPosition;
-                document.getElementById(frontEndPlayers[id].playerNumber.toString()).style.backgroundColor = "green";
+                //frontEndPlayers[id].currentPosition = backEndPlayer.currentPosition;
+                document.getElementById((frontEndPlayers[id].playerNumber).toString()).style.backgroundColor = "green";
             } else {
-                document.getElementById(frontEndPlayers[id].playerNumber.toString()).style.backgroundColor = "red";
+                document.getElementById((frontEndPlayers[id].playerNumber).toString()).style.backgroundColor = "red";
             }
         }
         for(const id in frontEndPlayers) {
@@ -46,6 +46,14 @@ socket.on('updatePlayers', (backEndPlayers) => {
 // updates the front end pieces 
 socket.on('pieces-list', (backEndPieces) => {
     frontEndPieces = [...backEndPieces];
+})
+
+socket.on('update-connected-players', (unconnected_players) => {
+    console.log(unconnected_players);
+    for(var i = 0; i < unconnected_players.length; i++) {
+        var realID = unconnected_players[i].toString();
+        document.getElementById(realID).style.backgroundColor = "#3498db";
+    }
 })
 
 function getUsername() {

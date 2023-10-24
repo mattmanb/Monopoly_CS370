@@ -38,6 +38,8 @@ var backEndPieces = ["Thimble", "Shoe", "Top Hat",
                      "Wheelbarrow", "Battleship", 
                      "Racecar", "Dog", "Cat"];
 
+var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
+
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.emit('pieces-list', backEndPieces);
@@ -48,22 +50,26 @@ io.on('connection', (socket) => {
         position: 0,
         inJail: false,
         turnsInJail: 0,
-        playerNumber: -1//NEED THIS VALUE TO BE THE LOWEST NUMBER BETWEEN 1 AND 8 THAT ISN'T ALREADY A PLAYERNUMBER
+        playerNumber: Math.min(...availablePlayers)//NEED THIS VALUE TO BE THE LOWEST NUMBER BETWEEN 1 AND 8 THAT ISN'T ALREADY A PLAYERNUMBER
     };
+
+    const pNindex = availablePlayers.indexOf(backEndPlayers[socket.id].playerNumber);
+    availablePlayers.splice(pNindex, 1);
 
     io.emit('updatePlayers', backEndPlayers); //emit to the front end; a new player joined
 
     socket.on('disconnect', (reason) => {
         console.log("disconnected...", reason);
+        availablePlayers.push(backEndPlayers[socket.id].playerNumber);
+        console.log(availablePlayers);
         delete backEndPlayers[socket.id];
+        io.emit('update-connected-players', availablePlayers);
         io.emit('updatePlayers', backEndPlayers);
     })
 
     socket.on('new-user-data', (userData) => {
-        backEndPlayers[socket.id] = {
-            name: userData.username,
-            piece: userData.piece
-        }
+        backEndPlayers[socket.id].name = userData.username;
+        backEndPlayers[socket.id].piece = userData.piece;
     })
 
     // front end request that a piece was taken
