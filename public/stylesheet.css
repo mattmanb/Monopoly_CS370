@@ -1,0 +1,74 @@
+h1 {
+  color: black;
+  text-align: center;
+  font-family: sans-serif;
+  font-size: 50px;
+}
+
+.pillDiv {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pill {
+  font-size: 20px;
+  padding: 0.5em, 1em;
+  margin: 0.25em;
+  border-radius: 1em;
+  border: none;
+  outline: none;
+  background: #dddddd;
+  cursor: pointer;
+}
+
+.pill:not(.pill--selected):hover {
+  background-color: #cccccc;
+}
+
+.pill--selected {
+  background-color: #009578;
+  color: white;
+}
+
+.pill--selected:hover {
+  background-color: rgb(204, 253, 204);
+  color: black;
+}
+
+.player-container {
+  margin:auto;
+  display: flex;
+  flex-wrap: wrap;
+  width: 1250px; /* Adjust the width as needed */
+}
+
+/* Define the player box style */
+.player-box {
+  width: 250px; /* Adjust the width as needed */
+  height: 250px; /* Adjust the height as needed */
+  background-color: #3498db; /* Default background color */
+  margin: 10px; /* Adjust the margin as needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: #fff; /* Text color */
+  font-weight: bold;
+  text-align: center;
+}
+
+form {
+  text-align: center;
+  display: flex;
+  justify-content: center; /* Center elements horizontally within the container */
+  align-items: center; /* Center elements vertically within the container */
+  flex-direction: column;
+}
+
+label, input, select {
+  height: 25px;
+  margin-top: 5px;
+  align-self: center;
+}
