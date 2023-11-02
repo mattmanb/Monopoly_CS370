@@ -1,91 +1,12 @@
-// import socket IO
-import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-
-// socket is the player connection
-const socket = io(); 
+//backend data
+frontEndPlayers = {}
+const socket = io(); // this player
 
 // Need to set as type module in HTML for this to work
 import { player } from './classes/player.js';
 import { property } from './classes/property.js'
 import { chance_card } from './classes/chance_card.js'
 import { community_chest_card } from './classes/community_chest_card.js'
-
-const frontEndPlayers = {}; //dictionary of players who connect (socket.id is the key for each player)
-var frontEndPieces = [];
-
-socket.on('updatePlayers', (backEndPlayers) => {
-    for (const id in backEndPlayers) { //update frontEndPlayers
-        const backEndPlayer = backEndPlayers[id];
-        if(!frontEndPlayers[id]) {
-            frontEndPlayers[id] = new player({ 
-                playerNumber: backEndPlayer.playerNumber
-            })
-            console.log("NEW PLAYER:", frontEndPlayers[id]);
-        } else {
-            if(id === socket.id) { //all this stuff is the username and piece entry
-                $(() => {
-                    var id = (frontEndPlayers[socket.id].playerNumber).toString();
-                    const $playerContainer = $("#" + id);
-                    $($playerContainer).css("background-color", 'green');
-                    if($playerContainer.find("form").length === 0) {
-                        //creates the form for a player to enter username and piece
-                        const form = $("<form>");
-
-                        const usernameLabel = $("<label>").text("Username: ");
-                        const usernameInput = $("<input>").attr("type", "text").attr("name", "username");
-
-                        const pieceLabel = $("<label>").text("Choose your piece: ");
-                        const pieceSelect = $("<select>").attr("name", "piece");
-
-                        $.each(frontEndPieces, function(index, value) {
-                            pieceSelect.append($("<option>").attr("value", value).text(value));
-                        })
-
-                        const submitButton = $("<input>").attr("type", "submit").val("Submit");
-
-                        form.append(usernameLabel, usernameInput, pieceLabel, pieceSelect, submitButton);
-
-                        $playerContainer.append(form);
-                        
-                        form.on("submit", (event) => {
-                            event.preventDefault();
-
-                            const username = usernameInput.val();
-                            const selectedPiece = pieceSelect.val();
-                            frontEndPieces.splice(frontEndPieces.indexOf(selectedPiece), 1);
-                            socket.emit('update-pieces', frontEndPieces);
-
-                            socket.emit('new-user-data', { username, selectedPiece })
-
-                            alert(`Username: ${username}\nPiece: ${selectedPiece}`);
-                        })
-                    }
-                })                
-            } else {
-                document.getElementById((frontEndPlayers[id].playerNumber).toString()).style.backgroundColor = "red";
-            }
-        }
-        for(const id in frontEndPlayers) {
-            if(!backEndPlayers[id]) {
-                delete frontEndPlayers[id];
-            }
-        }
-    }
-    //console.log(frontEndPlayers);
-});
-
-// updates the front end pieces 
-socket.on('pieces-list', (backEndPieces) => {
-    frontEndPieces = [...backEndPieces];
-})
-
-socket.on('update-connected-players', (unconnected_players) => {
-    console.log(unconnected_players);
-    for(var i = 0; i < unconnected_players.length; i++) {
-        var realID = unconnected_players[i].toString();
-        document.getElementById(realID).style.backgroundColor = "#3498db";
-    }
-})
 
 // we'll need a shuffle community cards
 // and a shuffle chance cards
@@ -125,6 +46,7 @@ function movePlayer(numSpaces, player) {
         player.addMoney(200)
         console.log("Pass GO, collect 200!")
     }
+    socket.emit('update-player', player) // emits new pos to the backend
     return
 }
 
