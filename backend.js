@@ -51,8 +51,9 @@ io.on('connection', (socket) => {
             position: 0,
             inJail: false,
             turnsInJail: 0,
-            playerNumber: Math.min(...availablePlayers)//NEED THIS VALUE TO BE THE LOWEST NUMBER BETWEEN 1 AND 8 THAT ISN'T ALREADY A PLAYERNUMBER
+            playerNumber: Math.min(...availablePlayers)
         };
+        backEndPlayer = backEndPlayers[socket.id];
 
         const pNindex = availablePlayers.indexOf(backEndPlayers[socket.id].playerNumber);
         availablePlayers.splice(pNindex, 1);
@@ -81,11 +82,30 @@ io.on('connection', (socket) => {
             backEndPieces = [...frontEndPieces];
             console.log("backend pieces updated!", backEndPieces);
             io.emit('pieces-list', (backEndPieces));
+        });
+
+        //new data from a FE player
+        socket.on('update-player', (frontEndPlayer) => {
+            backEndPlayer = {
+                name: frontEndPlayer.name,
+                piece: frontEndPlayer.piece,
+                money: frontEndPlayer.money,
+                position: frontEndPlayer.currentPosition,
+                inJail: frontEndPlayer.inJail,
+                turnsInJail: frontEndPlayer.turnsInJail,
+                playerNumber: frontEndPlayer.playerNumber
+            };
+            io.emit('update-players', backEndPlayers);
+        });
+
+        socket.on('start-game', () => {
+            io.emit('game-starting', "/play");
         })
 
         console.log(backEndPlayers);
     } else {
         console.log("Max players in lobby.");
+        socket.disconnect(true);
     }
 });
 

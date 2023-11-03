@@ -2,15 +2,16 @@
 
 <html lang="en">
   <head>
+    <title>MONOPOLYTECH</title>
     <link rel="stylesheet" href="stylesheet.css" />
   </head>
-  <title>MONOPOLYTECH</title>
+  
 
   <body>
     <h1>MONOPOLYTECHNIC</h1>
     <div class="pillDiv">
-      <a href="http://localhost:3000/play"> <!--Need to switch this to the website we host on later-->
-        <button class="pill pill--selected" type="button">Start Game</button>
+      <a> <!--Need to switch this to the website we host on later-->
+        <button id="startGameButton" class="pill pill--selected" type="button">Start Game</button>
       </a>
     </div>
     <div class="pillDiv">
@@ -18,11 +19,11 @@
         <button class="pill" type="button">Options</button>
       </a>
     </div>
-    <script type="module" src="./js/monopoly.js"></script>
     <script
     src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
     crossorigin="anonymous"></script>
+    <script type="module" src="./js/frontend.js"></script>
     <h1>Player Display</h1>
     <div class="player-container">
         <!-- Player 1 Box -->
