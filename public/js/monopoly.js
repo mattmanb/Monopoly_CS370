@@ -162,6 +162,13 @@ function landOnSpace(player) {
         }
     }
 
+    if (board[space] instanceof community_chest) {  //define this
+        giveCommunityChestCard(player, communityChestGameDeck);
+    }
+    if (board[space] instanceof chance) {  //define this
+        giveChanceChestCard(player, chanceGameDeck);
+    }
+
 
 }
 
