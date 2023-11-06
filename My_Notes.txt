@@ -1,2 +1,0 @@
-Theme: SUNY Poly
-Role: Board Functionality JS

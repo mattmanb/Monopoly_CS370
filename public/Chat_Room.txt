@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat Room</title>
+        <link rel="stylesheet" type="text/css" href="Chat_Room_style.css" /> 
+    </head>
+
+    <body>
+        <div id="chat">
+            <div id="chat-messages">
+            </div>
+                <form id="chat-form" method="post">
+                    <input type="text" name="message" placeholder="Enter a message..." maxlength="500" autocomplete="off">
+                    <button type="submit">Send</button>
+                </form>
+        </div>
+
+        <script type="text/javascript" src="WebSockets.js"></script>
+
+    </body>
+</html>

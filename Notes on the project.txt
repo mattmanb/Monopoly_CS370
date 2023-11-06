@@ -1,6 +1,0 @@
-Possible Roles to fill in:
-•Board Design (HTML) (Hussam & Cali)
-•Board Design (CSS) (Hussam & Cali)
-•Game Functionality (JS) (Javier)
-•Board Functionality (JS) (Brandon)
-•Online hosting and connecting (Matt)
