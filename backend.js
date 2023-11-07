@@ -92,6 +92,7 @@ io.on('connection', (socket) => {
                 money: frontEndPlayer.money,
                 position: frontEndPlayer.currentPosition,
                 inJail: frontEndPlayer.inJail,
+                outOfJailCards: frontEndPlayer.outOfJailCards,
                 turnsInJail: frontEndPlayer.turnsInJail,
                 playerNumber: frontEndPlayer.playerNumber
             };
