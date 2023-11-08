@@ -1,3 +1,6 @@
+//assume the backend is the most critical in terms of data (don't rely on
+//front end post requests!)
+
 /*   Server setup   */
 //express server
 const express = require('express')
@@ -32,7 +35,7 @@ app.get('/options', (req, res) => {
 })
 
 /* Start backend stuff */
-const backEndPlayers = {}
+const backEndPlayers = {} // dictionary of backend players with key=socket.id and value=player object
 
 var backEndPieces = ["Thimble", "Shoe", "Top Hat", 
                      "Wheelbarrow", "Battleship", 
@@ -43,23 +46,30 @@ var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
 io.on('connection', (socket) => {
     console.log('a user connected');
     if(availablePlayers.length > 0) {
+        //emit the pieces to the front end
         socket.emit('pieces-list', backEndPieces);
+        //initialize a player's data
         backEndPlayers[socket.id] = {
             name: null,
             piece: null,
             money: 1500,
             position: 0,
             inJail: false,
+            outOfJailCards: 0,
             turnsInJail: 0,
             playerNumber: Math.min(...availablePlayers)
         };
+        //get an instance of the new player
         backEndPlayer = backEndPlayers[socket.id];
 
+        //player number index update
         const pNindex = availablePlayers.indexOf(backEndPlayers[socket.id].playerNumber);
         availablePlayers.splice(pNindex, 1);
 
+        // send new player data to the front end
         io.emit('updatePlayers', backEndPlayers); //emit to the front end; a new player joined
 
+        // front end post to notify the backend that a user disconnected
         socket.on('disconnect', (reason) => {
             console.log("disconnected...", reason);
             availablePlayers.push(backEndPlayers[socket.id].playerNumber);
@@ -69,20 +79,26 @@ io.on('connection', (socket) => {
             io.emit('updatePlayers', backEndPlayers);
         })
 
+        // front end post to update a user's data
         socket.on('new-user-data', (userData) => {
             console.log("New user data:", userData);
-            backEndPlayers[socket.id].name = userData.username;
-            console.log(userData.selectedPiece)
-            backEndPlayers[socket.id].piece = userData.selectedPiece;
-            console.log(backEndPlayers);
+            if(!backEndPieces.includes(userData.selectedPiece)) { //if the piece sent isn't available
+                //piece is taken!
+                socket.emit('piece-taken', userData.selectedPiece);
+            } else {
+                backEndPlayers[socket.id].name = userData.username;
+                backEndPlayers[socket.id].piece = userData.selectedPiece;
+                const pieceInd = backEndPieces.indexOf(backEndPlayers[socket.id].piece);
+                backEndPieces.splice(pieceInd, 1);
+                socket.emit('player-alert', `Name and piece updated!\nName: ${backEndPlayers[socket.id].name}\nPiece: ${backEndPlayers[socket.id].piece}`);
+            }
+            
         })
 
-        // front end request that a piece was taken
-        socket.on('update-pieces', (frontEndPieces) => {
-            backEndPieces = [...frontEndPieces];
-            console.log("backend pieces updated!", backEndPieces);
+        // front end request to update the pieces
+        socket.on('fe-wants-pieces-updated', () => {
             io.emit('pieces-list', (backEndPieces));
-        });
+        })
 
         //new data from a FE player
         socket.on('update-player', (frontEndPlayer) => {

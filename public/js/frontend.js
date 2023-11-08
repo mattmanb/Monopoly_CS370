@@ -14,17 +14,18 @@ const frontEndPlayers = {}; //dictionary of players who connect (socket.id is th
 var frontEndPieces = [];
 
 socket.on('updatePlayers', (backEndPlayers) => {
+    socket.emit('fe-wants-pieces-updated'); //send the request to update fe pieces
     for (const id in backEndPlayers) { //update frontEndPlayers
         const backEndPlayer = backEndPlayers[id];
-        if(!frontEndPlayers[id]) {
+        if(!frontEndPlayers[id]) { //if the player exists on the backend but not the frontend
             frontEndPlayers[id] = new player({ 
                 playerNumber: backEndPlayer.playerNumber
             })
-        } else {
+        } else { //player exists on the front end and back end
             frontEndPlayers[id].name = backEndPlayers[id].name;
             frontEndPlayers[id].piece = backEndPlayers[id].piece;  
-            if(id === socket.id) { //all this stuff is the username and piece entry
-                $(() => {
+            if(id === socket.id) { //if the current player we're on sent the 'update-players' post
+                $(() => { //jquery load; this function creates the input for a player to enter name and piece
                     var id = (frontEndPlayers[socket.id].playerNumber).toString();
                     const $playerContainer = $("#" + id);
                     $($playerContainer).css("background-color", 'green');
@@ -53,18 +54,21 @@ socket.on('updatePlayers', (backEndPlayers) => {
 
                             const username = usernameInput.val();
                             const selectedPiece = pieceSelect.val();
-                            frontEndPieces.splice(frontEndPieces.indexOf(selectedPiece), 1);
-                            socket.emit('update-pieces', frontEndPieces);
 
-                            socket.emit('new-user-data', { username, selectedPiece })
-
-                            alert(`Username: ${username}\nPiece: ${selectedPiece}`);
+                            socket.emit('new-user-data', { username, selectedPiece });
                         })
                     
                     }
                 })    
-            } else {
-                document.getElementById((frontEndPlayers[id].playerNumber).toString()).style.backgroundColor = "red";
+            } else { //non-jquery here
+                const player_box = document.getElementById((frontEndPlayers[id].playerNumber).toString())
+                player_box.style.backgroundColor = "red";
+                if(frontEndPlayers[id].name && frontEndPlayers[id].piece) {
+                    const player_info = "<pre>" + "Name: " + frontEndPlayers[id].name + '\n' + "Piece: " + frontEndPlayers[id].piece + "</pre>";
+                    player_box.innerHTML = player_info;
+                } else {
+                    console.log("name:", frontEndPlayers[id].name);
+                }
             }
         }
         for(const id in frontEndPlayers) {
@@ -79,13 +83,21 @@ socket.on('updatePlayers', (backEndPlayers) => {
 // updates the front end pieces 
 socket.on('pieces-list', (backEndPieces) => {
     frontEndPieces = [...backEndPieces];
-})
+});
+
+socket.on('piece-taken', (piece) => {
+    alert(`The ${piece} piece is taken! Please try again.`)
+});
 
 socket.on('update-connected-players', (unconnected_players) => {
     for(var i = 0; i < unconnected_players.length; i++) {
         var realID = unconnected_players[i].toString();
         document.getElementById(realID).style.backgroundColor = "#3498db";
     }
+})
+
+socket.on('player-alert', (msg) => {
+    alert(msg);
 })
 
 socket.on('game-starting', (route) => {
