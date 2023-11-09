@@ -6,9 +6,6 @@ const socket = io();
 
 // Need to set as type module in HTML for this to work
 import { player } from './classes/player.js';
-import { property } from './classes/property.js'
-import { chance_card } from './classes/chance_card.js'
-import { community_chest_card } from './classes/community_chest_card.js'
 
 const frontEndPlayers = {}; //dictionary of players who connect (socket.id is the key for each player)
 var frontEndPieces = [];
@@ -18,19 +15,35 @@ socket.on('updatePlayers', (backEndPlayers) => {
     for (const id in backEndPlayers) { //update frontEndPlayers
         const backEndPlayer = backEndPlayers[id];
         if(!frontEndPlayers[id]) { //if the player exists on the backend but not the frontend
-            frontEndPlayers[id] = new player({ 
+            frontEndPlayers[id] = new player({
+                name: backEndPlayer.name,
+                piece: backEndPlayer.piece,
+                money: backEndPlayer.money,
+                position:backEndPlayer.position,
+                inJail:backEndPlayer.inJail,
+                outOfJailCards:backEndPlayer.outOfJailCards,
+                turnsInJail: backEndPlayer.turnsInJail,
                 playerNumber: backEndPlayer.playerNumber
             })
         } else { //player exists on the front end and back end
-            frontEndPlayers[id].name = backEndPlayers[id].name;
-            frontEndPlayers[id].piece = backEndPlayers[id].piece;  
+
+            //Update the player's info
+            frontEndPlayers[id].name = backEndPlayer.name,
+            frontEndPlayers[id].piece = backEndPlayer.piece,
+            frontEndPlayers[id].money = backEndPlayer.money,
+            frontEndPlayers[id].position = backEndPlayer.position,
+            frontEndPlayers[id].inJail = backEndPlayer.inJail,
+            frontEndPlayers[id].outOfJailCards = backEndPlayer.outOfJailCards,
+            frontEndPlayers[id].turnsInJail = backEndPlayer.turnsInJail,
+            frontEndPlayers[id].playerNumber = backEndPlayer.playerNumber 
+
             if(id === socket.id) { //if the current player we're on sent the 'update-players' post
                 $(() => { //jquery load; this function creates the input for a player to enter name and piece
                     var id = (frontEndPlayers[socket.id].playerNumber).toString();
                     const $playerContainer = $("#" + id);
                     $($playerContainer).css("background-color", 'green');
                     if($playerContainer.find("form").length === 0) {
-                        //creates the form for a player to enter username and piece
+                        //creates the form for a player to enter username and piece WITH jquery
                         const form = $("<form>");
 
                         const usernameLabel = $("<label>").text("Username: ");
@@ -60,7 +73,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
                     
                     }
                 })    
-            } else { //non-jquery here
+            } else { //if this isn't the player's front end (its another player's)
                 const player_box = document.getElementById((frontEndPlayers[id].playerNumber).toString())
                 player_box.style.backgroundColor = "red";
                 if(frontEndPlayers[id].name && frontEndPlayers[id].piece) {
@@ -71,8 +84,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
                 }
             }
         }
-        for(const id in frontEndPlayers) {
+        for(const id in frontEndPlayers) { //Ensure no players exist on the front end that don't on the backend
             if(!backEndPlayers[id]) {
+                const player_box = document.getElementById((frontEndPlayers[id].playerNumber).toString())
+                player_box.style.backgroundColor = "#3498db";
                 delete frontEndPlayers[id];
             }
         }
