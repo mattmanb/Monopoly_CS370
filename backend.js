@@ -1,6 +1,8 @@
 //assume the backend is the most critical in terms of data (don't rely on
 //front end post requests!)
 
+const fs = require('fs');
+
 /*   Server setup   */
 //express server
 const express = require('express')
@@ -18,7 +20,7 @@ const io = new Server(server, {
 }) //socket.io server wrapped around http server wrapped around express server (say that 10 times fast)
 /*   End Server setup   */
 
-const port = 3000 //changable later
+const port = 3000 //changable later (80 is default port)
 
 app.use(express.static('public')) //this makes the public directory accessible to the public (F12 on the page)
 
@@ -67,21 +69,23 @@ io.on('connection', (socket) => {
         availablePlayers.splice(pNindex, 1);
 
         // send new player data to the front end
-        io.emit('updatePlayers', backEndPlayers); //emit to the front end; a new player joined
+        io.emit('updateLobby', backEndPlayers); //emit to the front end; a new player joined
 
         // front end post to notify the backend that a user disconnected
         socket.on('disconnect', (reason) => {
             console.log("disconnected...", reason);
+            //add the piece and player number back to the list
             availablePlayers.push(backEndPlayers[socket.id].playerNumber);
-            console.log(availablePlayers);
+            if(backEndPlayers[socket.id].piece) {
+                backEndPieces.push(backEndPlayers[socket.id].piece);
+            }
             delete backEndPlayers[socket.id];
             io.emit('update-connected-players', availablePlayers);
-            io.emit('updatePlayers', backEndPlayers);
+            io.emit('updateLobby', backEndPlayers);
         })
 
         // front end post to update a user's data
         socket.on('new-user-data', (userData) => {
-            console.log("New user data:", userData);
             if(!backEndPieces.includes(userData.selectedPiece)) { //if the piece sent isn't available
                 //piece is taken!
                 socket.emit('piece-taken', userData.selectedPiece);
@@ -115,9 +119,18 @@ io.on('connection', (socket) => {
             io.emit('update-players', backEndPlayers);
         });
 
-        socket.on('start-game', () => {
-            io.emit('game-starting', "/play");
-        })
+        //load in the page we want to display for SPA
+        socket.on('load-page', async (page) => {
+            console.log(`Loading ${page}.html`);
+            filePath = `./public/${page}.html`;
+            fs.readFile(filePath, 'utf8', (err, data) => {
+                if(err) { 
+                    console.log(`Error reading in ${filePath}: ${err.message}`)
+                } else {
+                    io.emit('update-content', data);
+                }
+            })
+        });
 
         console.log(backEndPlayers);
     } else {
@@ -127,7 +140,7 @@ io.on('connection', (socket) => {
 });
 
 setInterval(() => {
-    io.emit('updatePlayers', backEndPlayers)
+    io.emit('updateLobby', backEndPlayers)
 }, 1000);
 
 //listen on the port

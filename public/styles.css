@@ -14,7 +14,66 @@ body {
   text-transform: uppercase;
 }
 
-h1,
+h1 {
+  color: black;
+  text-align: center;
+  font-family: sans-serif;
+  font-size: 50px;
+  margin:0;
+}
+
+.pillDiv {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pill:not(.pill--selected):hover {
+  background-color: #cccccc;
+}
+
+.player-container {
+  margin:auto;
+  display: flex;
+  flex-wrap: wrap;
+  width: 1250px; /* Adjust the width as needed */
+}
+
+/* Define the player box style */
+.player-box {
+  width: 250px; /* Adjust the width as needed */
+  height: 250px; /* Adjust the height as needed */
+  background-color: #3498db; /* Default background color */
+  margin: 10px; /* Adjust the margin as needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: #fff; /* Text color */
+  font-weight: bold;
+  font-size: large;
+  text-align: center;
+}
+
+form {
+  text-align: center;
+  display: flex;
+  justify-content: center; /* Center elements horizontally within the container */
+  align-items: center; /* Center elements vertically within the container */
+  flex-direction: column;
+}
+
+div > p {
+  margin-bottom: 3px;
+}
+
+label, input, select {
+  height: 20px;
+  margin-top: 5px;
+  align-self: center;
+}
+
 h2,
 h3,
 h4,
@@ -285,7 +344,7 @@ h6 {
 }
 .CC .container {
   align-items: center;
-  transform: rotate(45deg);
+  
 }
 .CC .name {
   font-size: 14px;
