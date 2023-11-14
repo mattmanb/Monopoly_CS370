@@ -20,7 +20,8 @@ export class community_chest_card {
             "Receive $25 for tutoring",
             "You are assessed for street repairs–$40 per classroom–$115 per lecture hall",
             "Vending machine mishap–Collect $10",
-            "Sidewalk surprise! You found $100"
+            "Sidewalk surprise! You found $100",
+            "Fundraising success! Each player owes you $100"
         ];
 
         if(communityChestGameDeck.length <= 1) {
@@ -30,7 +31,7 @@ export class community_chest_card {
         let cardDelt = communityChestGameDeck[randomIndex];
         communityChestGameDeck.splice(randomIndex, 1);
 
-        if(cardDelt == "Get Out of CC Free")
+        if(cardDelt == "Get Out of CC Free") 
             player.outOfJailCards++;
         return cardDelt;
     }
