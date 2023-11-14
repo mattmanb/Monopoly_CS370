@@ -19,7 +19,8 @@ export class chance_card {
             "Admire the statue–Advance token to Wildcat Statue",
             "You have been elected Class President–Pay each player $50",
             "Get a paid internship—Collect $150",
-            "Ace your midterms for a reward—Collect $100"
+            "Ace your midterms for a reward—Collect $100",
+            "You started a side hustle and your fellow students love it. Each player pays you $50"
         ];
 
         if(chanceGameDeck.length <= 1) {

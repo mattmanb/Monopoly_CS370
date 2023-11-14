@@ -120,13 +120,14 @@ function attemptJailLeave(player) {
     else {
         // Count how many turns they've been in jail
         player.setTurnsInJail(player.getTurnsInJail() + 1)
+        socket.emit('update-player', player);
     }
     return
 }
 
 function landOnSpace(player) {
 
-    let space = player.getPosition()
+    const space = player.getPosition()
 
     // Will employ some kind of switch function here to determine what to do
     // Property: check owner
@@ -247,7 +248,7 @@ function landOnSpace(player) {
         giveChanceChestCard(player, chanceGameDeck);
     }
 
-
+    socket.emit('update-player', player);
 }
 
 function checkMonopoly(space) {
@@ -322,8 +323,8 @@ function checkMonopoly(space) {
 function railroadRent(owner) {
     numRailroads = 0
     for(i = 0 ; i < 4 ; i++) {
-        if (board[5 + (i * 10)].owner == owner) {
-            numRrailroads += 1
+        if (board[5 + (i * 10)].owner === owner) {
+            numRailroads += 1
         }
     }
     rent = (2 ** (numRailroads - 1)) * 25
