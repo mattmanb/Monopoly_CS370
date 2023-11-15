@@ -7,14 +7,15 @@ const chanceDeck = [
     "Bursar pays you $50",
     "Get Out of CC Free",
     "Go Back 3 Spaces",
-    "Eat at CC–Go directly to CC–Do not pass Go, do not collect $200",
+    "Eat at CC–Go directly to CC–Do not pass Go, do not collect $200",  //square 40 & player.injail = true; turns in jail = 3
     "Make general repairs on all your property–For each classroom pay $25–For each lecture hall $100",
     "Grab a meal off campus, lose $15",
     "Take a trip to Oriskany–If you pass Go, collect $200",
-    "Admire the statue–Advance token to Wildcat Statue",
+    "Admire the statue–Advance token to Wildcat Statue",    //square 39
     "You have been elected Class President–Pay each player $50",
     "Get a paid internship—Collect $150",
-    "Ace your midterms for a reward—Collect $100"
+    "Ace your midterms for a reward—Collect $100",
+    "You started a side hustle and your fellow students love it. Each player pays you $50"
 ];
 
 
