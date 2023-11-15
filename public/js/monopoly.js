@@ -1,91 +1,14 @@
-// import socket IO
-import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-
-// socket is the player connection
-const socket = io(); 
+//backend data
+frontEndPlayers = {}
+const socket = io(); // this player
 
 // Need to set as type module in HTML for this to work
 import { player } from './classes/player.js';
 import { property } from './classes/property.js'
 import { chance_card } from './classes/chance_card.js'
 import { community_chest_card } from './classes/community_chest_card.js'
-
-const frontEndPlayers = {}; //dictionary of players who connect (socket.id is the key for each player)
-var frontEndPieces = [];
-
-socket.on('updatePlayers', (backEndPlayers) => {
-    for (const id in backEndPlayers) { //update frontEndPlayers
-        const backEndPlayer = backEndPlayers[id];
-        if(!frontEndPlayers[id]) {
-            frontEndPlayers[id] = new player({ 
-                playerNumber: backEndPlayer.playerNumber
-            })
-            console.log("NEW PLAYER:", frontEndPlayers[id]);
-        } else {
-            if(id === socket.id) { //all this stuff is the username and piece entry
-                $(() => {
-                    var id = (frontEndPlayers[socket.id].playerNumber).toString();
-                    const $playerContainer = $("#" + id);
-                    $($playerContainer).css("background-color", 'green');
-                    if($playerContainer.find("form").length === 0) {
-                        //creates the form for a player to enter username and piece
-                        const form = $("<form>");
-
-                        const usernameLabel = $("<label>").text("Username: ");
-                        const usernameInput = $("<input>").attr("type", "text").attr("name", "username");
-
-                        const pieceLabel = $("<label>").text("Choose your piece: ");
-                        const pieceSelect = $("<select>").attr("name", "piece");
-
-                        $.each(frontEndPieces, function(index, value) {
-                            pieceSelect.append($("<option>").attr("value", value).text(value));
-                        })
-
-                        const submitButton = $("<input>").attr("type", "submit").val("Submit");
-
-                        form.append(usernameLabel, usernameInput, pieceLabel, pieceSelect, submitButton);
-
-                        $playerContainer.append(form);
-                        
-                        form.on("submit", (event) => {
-                            event.preventDefault();
-
-                            const username = usernameInput.val();
-                            const selectedPiece = pieceSelect.val();
-                            frontEndPieces.splice(frontEndPieces.indexOf(selectedPiece), 1);
-                            socket.emit('update-pieces', frontEndPieces);
-
-                            socket.emit('new-user-data', { username, selectedPiece })
-
-                            alert(`Username: ${username}\nPiece: ${selectedPiece}`);
-                        })
-                    }
-                })                
-            } else {
-                document.getElementById((frontEndPlayers[id].playerNumber).toString()).style.backgroundColor = "red";
-            }
-        }
-        for(const id in frontEndPlayers) {
-            if(!backEndPlayers[id]) {
-                delete frontEndPlayers[id];
-            }
-        }
-    }
-    //console.log(frontEndPlayers);
-});
-
-// updates the front end pieces 
-socket.on('pieces-list', (backEndPieces) => {
-    frontEndPieces = [...backEndPieces];
-})
-
-socket.on('update-connected-players', (unconnected_players) => {
-    console.log(unconnected_players);
-    for(var i = 0; i < unconnected_players.length; i++) {
-        var realID = unconnected_players[i].toString();
-        document.getElementById(realID).style.backgroundColor = "#3498db";
-    }
-})
+import { railroad } from './classes/railroad.js';
+import { utility } from './classes/utility.js';
 
 // we'll need a shuffle community cards
 // and a shuffle chance cards
@@ -125,6 +48,7 @@ function movePlayer(numSpaces, player) {
         player.addMoney(200)
         console.log("Pass GO, collect 200!")
     }
+    socket.emit('update-player', player) // emits new pos to the backend
     return
 }
 
@@ -196,13 +120,14 @@ function attemptJailLeave(player) {
     else {
         // Count how many turns they've been in jail
         player.setTurnsInJail(player.getTurnsInJail() + 1)
+        socket.emit('update-player', player);
     }
     return
 }
 
 function landOnSpace(player) {
 
-    let space = player.getPosition()
+    const space = player.getPosition()
 
     // Will employ some kind of switch function here to determine what to do
     // Property: check owner
@@ -240,6 +165,82 @@ function landOnSpace(player) {
         }
     }
 
+    if (board[space] instanceof railroad) {
+        // Check if there's no owner
+        if (board[space].owner == null) {
+
+            // Check if player can afford property
+            if (player.getMoney() >= board[space].price) {
+
+                // Ask player if they want to buy it
+                let choice = confirm("Would you like to buy " + board[space].name + " for " + board[space].price.toString() + "?")
+                if (choice) {
+
+                    // Buying property
+                    board[space].owner = player
+                    player.addMoney(-1 * board[space].price)
+                    console.log(board[space].name + " is now owned by " + player.getName())
+                    console.log(player.getName() + " now has " + player.getMoney().toString())
+                }
+                else {
+                    // Not buying property (need to add auctions)
+                    console.log(player.getName() + " has chosen not to buy " + board[space].name)
+                }
+            }
+            else {
+                // Player can't afford property
+                console.log(player.getName() + " doesn't have enough money.")
+            }
+        }
+        else if (board[space].owner != player){
+            // Player pays owner if they don't own this property
+            rent = railroadRent(board[space].owner) * 50
+            console.log(player.getName() + " pays " + board[space].owner.getName() + " " + rent.toString() + ".")
+            board[space].owner.addMoney(rent)
+            player.addMoney(-1 * rent)
+        }
+
+
+    }
+
+    if (board[space] instanceof utility) {
+        // Check if there's no owner
+        if (board[space].owner == null) {
+
+            // Check if player can afford property
+            if (player.getMoney() >= board[space].price) {
+
+                // Ask player if they want to buy it
+                let choice = confirm("Would you like to buy " + board[space].name + " for " + board[space].price.toString() + "?")
+                if (choice) {
+
+                    // Buying property
+                    board[space].owner = player
+                    player.addMoney(-1 * board[space].price)
+                    console.log(board[space].name + " is now owned by " + player.getName())
+                    console.log(player.getName() + " now has " + player.getMoney().toString())
+                }
+                else {
+                    // Not buying property (need to add auctions)
+                    console.log(player.getName() + " has chosen not to buy " + board[space].name)
+                }
+            }
+            else {
+                // Player can't afford property
+                console.log(player.getName() + " doesn't have enough money.")
+            }
+        }
+        else if (board[space].owner != player){
+            // Player pays owner if they don't own this property
+            rent = utilityRent()
+            console.log(player.getName() + " pays " + board[space].owner.getName() + " " + rent.toString() + ".")
+            board[space].owner.addMoney(rent)
+            player.addMoney(-1 * rent)
+        }
+
+
+    }
+
     if (board[space] instanceof community_chest) {  //define this
         giveCommunityChestCard(player, communityChestGameDeck);
     }
@@ -247,7 +248,99 @@ function landOnSpace(player) {
         giveChanceChestCard(player, chanceGameDeck);
     }
 
+    socket.emit('update-player', player);
+}
 
+function checkMonopoly(space) {
+    isMonopoly = false
+    switch(space) {
+        case 1:
+        case 3:
+            if (board[1].owner == board[3].owner) {
+                isMonopoly = true
+            }
+            break
+
+        case 6:
+        case 8:
+        case 9:
+            if (board[6].owner == board[8].owner && board[6].owner == board[9].owner) {
+                isMonopoly = true
+            }
+            break
+
+        case 11:
+        case 13:
+        case 14:
+            if (board[11].owner == board[13].owner && board[11].owner == board[14].owner) {
+                isMonopoly = true
+            }
+            break
+
+        case 16:
+        case 18:
+        case 19:
+            if (board[16].owner == board[18].owner && board[16].owner == board[19].owner) {
+                isMonopoly = true
+            }
+            break
+
+        case 21:
+        case 23:
+        case 24:
+            if (board[21].owner == board[23].owner && board[21].owner == board[24].owner) {
+                isMonopoly = true
+            }
+            break
+        
+        case 26:
+        case 27:
+        case 29:
+            if (board[26].owner == board[27].owner && board[26].owner == board[29].owner) {
+                isMonopoly = true
+            }
+            break
+
+        case 31:
+        case 32:
+        case 34:
+            if (board[31].owner == board[32].owner && board[31].owner == board[34].owner) {
+                isMonopoly = true
+            }
+            break
+
+        case 37:
+        case 39:
+            if (board[37].owner == board[39].owner) {
+                isMonopoly = true
+            }
+            break
+    }
+
+    return isMonopoly
+}
+
+function railroadRent(owner) {
+    numRailroads = 0
+    for(i = 0 ; i < 4 ; i++) {
+        if (board[5 + (i * 10)].owner === owner) {
+            numRailroads += 1
+        }
+    }
+    rent = (2 ** (numRailroads - 1)) * 25
+    return rent
+}
+
+function utilityRent() {
+    bothUtilities = false
+    rent = addDice(rollDice(), rollDice())
+    if (board[12].owner == board[28].owner) {
+        rent = rent * 10
+    }
+    else {
+        rent = rent * 4
+    }
+    return rent
 }
 
 /*
@@ -285,6 +378,10 @@ board[3] = new property({
     rent:[4, 20, 60, 180, 320, 450], 
     houseCost:50,
     mortgage:30 });
+board[5] = new railroad({
+    name:"Reading Railroad",
+    price:200,
+    mortgage:100 });
 board[6] = new property({
     name:"Oriental Avenue", 
     price:100, 
@@ -309,6 +406,10 @@ board[11] = new property({
     rent:[10, 50, 150, 450, 625, 750], 
     houseCost:100,
     mortgage:70 });
+board[12] = new utility({
+    name:"Electric Company",
+    price:150,
+    mortgage:75 });
 board[13] = new property({
     name:"States Avenue", 
     price:140, 
@@ -321,6 +422,10 @@ board[14] = new property({
     rent:[12, 60, 180, 500, 700, 900], 
     houseCost:100,
     mortgage:80 });
+board[15] = new railroad({
+    name:"Pennsylvania Railroad",
+    price:200,
+    mortgage:100 });
 board[16] = new property({
     name:"St. James Place", 
     price:180, 
@@ -357,6 +462,10 @@ board[24] = new property({
     rent:[20, 100, 300, 750, 925, 1100], 
     houseCost:100,
     mortgage:120 });
+board[25] = new railroad({
+    name:"B. & O. Railroad",
+    price:200,
+    mortgage:100 });
 board[26] = new property({
     name:"Atlantic Avenue", 
     price:260, 
@@ -369,6 +478,10 @@ board[27] = new property({
     rent:[22, 110, 330, 800, 975, 1150], 
     houseCost:150,
     mortgage:130 });
+board[28] = new utility({
+    name:"Water Works",
+    price:150,
+    mortgage:75 });
 board[29] = new property({
     name:"Marvin Gardens", 
     price:280, 
@@ -393,6 +506,10 @@ board[34] = new property({
     rent:[28, 150, 450, 1000, 1200, 1400], 
     houseCost:200,
     mortgage:160 });
+board[35] = new railroad({
+    name:"Short Line",
+    price:200,
+    mortgage:100 });
 board[37] = new property({
     name:"Park Place", 
     price:350, 

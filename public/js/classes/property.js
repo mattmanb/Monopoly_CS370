@@ -7,6 +7,7 @@ export class property { //color to be implemented in street.js
         this.rent = rent; //list of rents with houses then hotel
         this.rentLevel = 0; //base rent is rent[0]
         this.houseCost = houseCost;
+        this.numHouses = 0;
         this.mortgage = mortgage;
         this.owner = null;
     }

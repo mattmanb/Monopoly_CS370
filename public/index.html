@@ -2,48 +2,20 @@
 
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="stylesheet.css" />
+    <title>MONOPOLYTECH</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous">
+    </script>
+    <script type="module" src="./js/frontend.js"></script>
   </head>
-  <title>MONOPOLYTECH</title>
 
   <body>
     <h1>MONOPOLYTECHNIC</h1>
-    <div class="pillDiv">
-      <a href="http://localhost:3000/play"> <!--Need to switch this to the website we host on later-->
-        <button class="pill pill--selected" type="button">Start Game</button>
-      </a>
+    <div id="app"> <!--SPA element: this div will contain the content for the page, loaded in using javascript-->
+      
     </div>
-    <div class="pillDiv">
-      <a href="http://localhost:3000/options">
-        <button class="pill" type="button">Options</button>
-      </a>
-    </div>
-    <script type="module" src="./js/monopoly.js"></script>
-    <script
-    src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-    crossorigin="anonymous"></script>
-    <h1>Player Display</h1>
-    <div class="player-container">
-        <!-- Player 1 Box -->
-        <div class="player-box" id="1"><p>Player 1</p></div>
-        <!-- Player 2 Box -->
-        <div class="player-box" id="2"><p>Player 2</p></div>
-        <!-- Player 3 Box -->
-        <div class="player-box" id="3"><p>Player 3</p></div>
-        <!-- Player 4 Box -->
-        <div class="player-box" id="4"><p>Player 4</p></div>
-        <!-- Player 5 Box -->
-        <div class="player-box" id="5"><p>Player 5</p></div>
-        <!-- Player 6 Box -->
-        <div class="player-box" id="6"><p>Player 6</p></div>
-        <!-- Player 7 Box -->
-        <div class="player-box" id="7"><p>Player 7</p></div>
-        <!-- Player 8 Box -->
-        <div class="player-box" id="8"><p>Player 8</p></div>
-    </div>
-  
-  
-  
   </body>
 </html>
