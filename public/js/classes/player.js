@@ -6,6 +6,7 @@ export class player {
         this.money = 1500;
         this.currentPosition = 0;
         this.inJail = false;
+        this.outOfJailCards = 0;
         this.turnsInJail = 0;
         this.playerNumber = playerNumber;
     }
