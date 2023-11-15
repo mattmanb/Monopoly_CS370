@@ -1,12 +1,19 @@
 //assume the backend is the most critical in terms of data (don't rely on
 //front end post requests!)
 
+import { player } from './classes/player.js';
+import { property } from './classes/property.js';
+import { chance_card } from './classes/chance_card.js';
+import { community_chest_card } from './classes/community_chest_card.js';
+import { railroad } from './classes/railroad.js';
+import { utility } from './classes/utility.js';
+
 const fs = require('fs');
 
 /*   Server setup   */
 //express server
-const express = require('express')
-const app = express() //here is the express server
+const express = require('express');
+const app = express(); //here is the express server
 
 //http server
 const http = require('http')
@@ -17,24 +24,16 @@ const { Server } = require('socket.io')
 const io = new Server(server, { 
     pingInterval:2000,
     pingTimeout:5000
-}) //socket.io server wrapped around http server wrapped around express server (say that 10 times fast)
+}); //socket.io server wrapped around http server wrapped around express server (say that 10 times fast)
 /*   End Server setup   */
 
-const port = 3000 //changable later (80 is default port)
+const port = 3000; //changable later (80 is default port)
 
-app.use(express.static('public')) //this makes the public directory accessible to the public (F12 on the page)
+app.use(express.static('public')); //this makes the public directory accessible to the public (F12 on the page)
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index.html'); // NEED TO CHANGE THIS IF THE MAIN HTML PAGE ISNT 'index.html'
-})
-
-app.get('/play', (req, res) => {
-    res.sendFile(__dirname + '/public/board.html');
-})
-
-app.get('/options', (req, res) => {
-    res.sendFile(__dirname + '/public/options.html');
-})
+});
 
 /* Start backend stuff */
 const backEndPlayers = {} // dictionary of backend players with key=socket.id and value=player object
@@ -82,7 +81,7 @@ io.on('connection', (socket) => {
             delete backEndPlayers[socket.id];
             io.emit('update-connected-players', availablePlayers);
             io.emit('updateLobby', backEndPlayers);
-        })
+        });
 
         // front end post to update a user's data
         socket.on('new-user-data', (userData) => {
@@ -97,7 +96,7 @@ io.on('connection', (socket) => {
                 socket.emit('player-alert', `Name and piece updated!\nName: ${backEndPlayers[socket.id].name}\nPiece: ${backEndPlayers[socket.id].piece}`);
             }
             
-        })
+        });
 
         // front end request to update the pieces
         socket.on('fe-wants-pieces-updated', () => {
@@ -147,4 +146,4 @@ setInterval(() => {
 
 server.listen(port, () => {
     console.log(`Server listening on port ${port}`)
-})
+});

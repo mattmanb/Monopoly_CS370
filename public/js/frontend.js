@@ -6,7 +6,7 @@ import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
 
 // socket is the player connection
 const socket = io(); 
-socket.emit('load-page', ("lobby"))
+socket.emit('load-page', ("lobby"));
 var inLobby = true;
 
 const frontEndPlayers = {}; //dictionary of players who connect (socket.id is the key for each player)
@@ -176,6 +176,7 @@ function createUserForm(id) {
     } 
     else 
     {
+        //move this to the if and make it happen reguardless? then people can change their username and piece after initializing them
             const player_info_element = `#${playerNumber} p:first`;
             const player_info = "<pre>" + "Name: " + frontEndPlayers[id].name + '\n' + "Piece: " + frontEndPlayers[id].piece + "</pre>";
             $(player_info_element).html(player_info)
