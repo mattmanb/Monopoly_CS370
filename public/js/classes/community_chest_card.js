@@ -1,5 +1,5 @@
 // community chest class
-export class community_chest_card {
+class community_chest_card {
 
     //This function gives the player a card from the community chest deck
     giveCommunityChestCard(player, communityChestGameDeck) {

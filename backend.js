@@ -1,12 +1,17 @@
 //assume the backend is the most critical in terms of data (don't rely on
 //front end post requests!)
 
-import { player } from './classes/player.js';
-import { property } from './classes/property.js';
-import { chance_card } from './classes/chance_card.js';
-import { community_chest_card } from './classes/community_chest_card.js';
-import { railroad } from './classes/railroad.js';
-import { utility } from './classes/utility.js';
+//can't use import/export statements without making this a 'module'
+//this syntax works instead
+const Player = require('./public/js/classes/player.js');
+//i.e. const new_player = new Player({attr:value, attr2:value2, etc.})
+const Property = require('./public/js/classes/property.js');
+const Chance_Card = require('./public/js/classes/chance_card.js');
+const Community_Chest_Card = require('./public/js/classes/community_chest_card.js');
+const Railroad = require('./public/js/classes/railroad.js');
+const Utility = require('./public/js/classes/utility.js');
+const Board = require('./public/js/classes/board.js');
+const Jail = require('./public/js/classes/jail.js');
 
 const fs = require('fs');
 
@@ -129,6 +134,15 @@ io.on('connection', (socket) => {
                     io.emit('update-content', data);
                 }
             })
+        });
+
+        socket.on('send-message', (senderID, msg) => {
+            if(senderID !== null) {
+                msg = `${backEndPlayers[socket.id].name}: ${msg}`;
+                io.emit('msg-incoming', msg);
+            } else {
+                socket.emit('msg-incoming', msg);
+            }
         });
 
         console.log(backEndPlayers);
