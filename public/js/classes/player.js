@@ -1,5 +1,5 @@
 // Player class
-export class player {
+class player {
     constructor({ name, piece, playerNumber }) {
         this.name = name;
         this.piece = piece;

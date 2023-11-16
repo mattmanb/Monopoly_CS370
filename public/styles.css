@@ -460,3 +460,38 @@ h6 {
   background-color: rgb(204, 253, 204);
   color: black;
 }
+
+#chat {
+  position:absolute;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  padding:10px;
+  width:200px;
+  height:200px;
+  overflow-y: scroll;
+  overflow-x:hidden;
+  min-width: 100px;
+  min-height: 100px;
+}
+
+#dragHandle {
+  cursor: move;
+  background-color: #ddd;
+  padding: 5px;
+  text-align: center;
+}
+
+.resize-handle {
+  height: 10px;
+  background-color: #3498db;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
+}
+
+.message{color:blue;}
+
+.draggable {
+  user-select: none;
+}

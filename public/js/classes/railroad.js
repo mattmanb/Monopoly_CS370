@@ -1,6 +1,6 @@
 // railroad class
 
-export class railroad {
+class railroad {
     constructor({name, price, mortgage}) {
         this.name = name
         this.price = price
