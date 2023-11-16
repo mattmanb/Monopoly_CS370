@@ -14,6 +14,16 @@
 
   <body>
     <h1>MONOPOLYTECHNIC</h1>
+    <div id="chat" class="draggable resizable">
+      <div id="dragHandle" class="drag-handle">Drag me</div>
+      <div id="resizeHandle" class="resize-handle">Resize Chat</div>
+      <div id="chat-messages">
+      </div>
+      <form id="chat-form" method="post">
+          <input type="text" id="msg-input" name="message" placeholder="Enter a message..." maxlength="500" autocomplete="off">
+          <button type="submit" id="send-button">Send</button>
+      </form>
+    </div>
     <div id="app"> <!--SPA element: this div will contain the content for the page, loaded in using javascript-->
       
     </div>

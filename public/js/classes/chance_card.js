@@ -1,5 +1,5 @@
 // chance card class
-export class chance_card {
+class chance_card {
 
     //This function gives the player a card from the chance deck
     giveChanceCard(player, chanceGameDeck) {

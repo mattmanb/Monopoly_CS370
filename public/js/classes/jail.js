@@ -1,3 +1,3 @@
-export class jail {
+class jail {
     
 }
