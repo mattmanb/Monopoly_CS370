@@ -1,12 +1,14 @@
 // Player class
-export class player {
-    constructor(name, piece) {
-        this.name = name
-        this.piece = piece
-        this.money = 1500
-        this.currentPosition = 0
-        this.inJail = false
-        this.turnsInJail = 0
+class player {
+    constructor({ name, piece, playerNumber }) {
+        this.name = name;
+        this.piece = piece;
+        this.money = 1500;
+        this.currentPosition = 0;
+        this.inJail = false;
+        this.outOfJailCards = 0;
+        this.turnsInJail = 0;
+        this.playerNumber = playerNumber;
     }
 
     setName(name) {

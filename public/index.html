@@ -2,21 +2,30 @@
 
 <html lang="en">
   <head>
+    <title>MONOPOLYTECH</title>
     <link rel="stylesheet" href="styles.css" />
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous">
+    </script>
+    <script type="module" src="./js/frontend.js"></script>
   </head>
-  <title>MONOPOLYTECH</title>
 
   <body>
     <h1>MONOPOLYTECHNIC</h1>
-    <div class="pillDiv">
-      <a href="board.html">
-        <button class="pill2 pill--selected2" type="button">Start Game</button>
-      </a>
+    <div id="chat" class="draggable resizable">
+      <div id="dragHandle" class="drag-handle">Drag me</div>
+      <div id="resizeHandle" class="resize-handle">Resize Chat</div>
+      <div id="chat-messages">
+      </div>
+      <form id="chat-form" method="post">
+          <input type="text" id="msg-input" name="message" placeholder="Enter a message..." maxlength="500" autocomplete="off">
+          <button type="submit" id="send-button">Send</button>
+      </form>
     </div>
-    <div class="pillDiv">
-      <a href="options.html">
-        <button class="pill2" type="button">Options</button>
-      </a>
+    <div id="app"> <!--SPA element: this div will contain the content for the page, loaded in using javascript-->
+      
     </div>
   </body>
 </html>
