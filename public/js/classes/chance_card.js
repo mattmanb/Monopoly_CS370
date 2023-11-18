@@ -1,21 +1,20 @@
 // chance card class
 class chance_card {
-
+    //The parameters have default values; aka parameters pass in on spaces 4 and 38
+    constructor(special_condition = false, player = null, price = null) {
+        this.special_condition = special_condition;
+        this.player = player;
+        this.price = price;
+        if(this.special_condition) {
+            executeSpecialCondition(this.player, this.price)
+        }
+    }
+    executeSpecialCondition(player, price) {
+        player.addMoney(price); //add or subtract based on the price
+        return;
+    }
     //This function gives the player a card from the chance deck
     giveChanceCard(player, chanceGameDeck) {
-        //The parameters have default values; aka parameters pass in on spaces 4 and 38
-        constructor(special_condition = false, player = null, price = null) {
-            this.special_condition = special_condition;
-            this.player = player;
-            this.price = price;
-            if(this.special_condition) {
-                executeSpecialCondition(this.player, this.price)
-            }
-        }
-        executeSpecialCondition(player, price) {
-            player.addMoney(price); //add or subtract based on the price
-            return;
-        }
         const chanceDeck = [
             "Advance to Go (Collect $200)",
             "Get some tutoring at the learning center—If you pass Go, collect $200",
