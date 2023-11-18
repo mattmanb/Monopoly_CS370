@@ -11,59 +11,14 @@ class player {
         this.playerNumber = playerNumber;
     }
 
-    setName(name) {
-        this.name = name
-        return
-    }
-
-    getName() {
-        return this.name
-    }
-
-    setPiece(piece) {
-        this.piece = piece
-        return
-    }
-
-    getPiece() {
-        return this.piece
-    }
-
     addMoney(money) {
         this.money += money
+        if(this.money <= 0) {
+            bankrupt();
+        }
         return
     }
-
-    getMoney() {
-        return this.money
+    bankrupt() {
+        //method to handle bankrupcy
     }
-
-    setPosition(position) {
-        this.currentPosition = position
-        return
-    }
-
-    getPosition() {
-        return this.currentPosition
-    }
-
-    setInJail(inJail) {
-        this.inJail = inJail
-        return
-    }
-
-    getInJail() {
-        return this.inJail
-    }
-
-    setTurnsInJail(turns) {
-        this.turnsInJail = turns
-        return
-    }
-
-    getTurnsInJail() {
-        return this.turnsInJail
-    }
-
-
 }

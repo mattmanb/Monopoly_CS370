@@ -1,6 +1,6 @@
 // property class
 
-class property { //color to be implemented in street.js
+class property{ //color to be implemented in street.js
     constructor({ name, price, rent, houseCost, mortgage }) {
         this.name = name;
         this.price = price;
@@ -11,7 +11,21 @@ class property { //color to be implemented in street.js
         this.mortgage = mortgage;
         this.owner = null;
     }
-    getName() {
-        return this.name;
+    isOwned() {
+        if(this.owner !== null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    payRent(player) {
+        if(this.owner !== player) {
+            player.addMoney(this.rent[rentLevel] * -1); //subtracts the rent of this property from the player's total
+        } 
+    }
+    queryPurchase(player) {
+        if(player.money >= this.price) {
+            
+        }
     }
 }
