@@ -29,3 +29,4 @@ class property{ //color to be implemented in street.js
         }
     }
 }
+module.exports = property;

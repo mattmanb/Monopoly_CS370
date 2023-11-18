@@ -10,7 +10,11 @@ class chance_card {
         }
     }
     executeSpecialCondition(player, price) {
-        player.addMoney(price); //add or subtract based on the price
+        if(price === 200) {
+            player.addMoney(Math.max(-200, player.money*-.2))
+        } else {
+            player.addMoney(price); //add or subtract based on the price
+        }
         return;
     }
     //This function gives the player a card from the chance deck
@@ -50,3 +54,4 @@ class chance_card {
     
 }
 
+module.exports = chance_card;

@@ -11,7 +11,6 @@ const Community_Chest_Card = require('./public/js/classes/community_chest_card.j
 const Railroad = require('./public/js/classes/railroad.js');
 const Utility = require('./public/js/classes/utility.js');
 const Board = require('./public/js/classes/board.js');
-const Jail = require('./public/js/classes/jail.js');
 
 const fs = require('fs');
 
@@ -55,16 +54,7 @@ io.on('connection', (socket) => {
         //emit the pieces to the front end
         socket.emit('pieces-list', backEndPieces);
         //initialize a player's data
-        backEndPlayers[socket.id] = {
-            name: null,
-            piece: null,
-            money: 1500,
-            position: 0,
-            inJail: false,
-            outOfJailCards: 0,
-            turnsInJail: 0,
-            playerNumber: Math.min(...availablePlayers)
-        };
+        backEndPlayers[socket.id] = new Player({playerNumber: Math.min(...availablePlayers)});
         //get an instance of the new player
         backEndPlayer = backEndPlayers[socket.id];
 

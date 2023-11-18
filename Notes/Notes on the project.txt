@@ -23,3 +23,7 @@ utility - startAuction() - begins an auction for the utility
 
 DONE jail - sendToJail(player) - sends a player to jail and handles accordingly
 NOT exactly sure how we should handle jail
+
+COMMIT 11/18
+- Removing jail.js (jail gets handled using player methods)
+- Integrating code from monopoly.js to backend.js and class methods/data

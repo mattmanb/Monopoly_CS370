@@ -16,3 +16,4 @@ class railroad {
     }
 
 }
+module.exports = railroad;

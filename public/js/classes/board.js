@@ -3,13 +3,11 @@ const Chance_Card = require('./chance_card.js');
 const Community_Chest_Card = require('./community_chest_card.js');
 const Railroad = require('./railroad.js');
 const Utility = require('./utility.js');
-const Jail = require('./jail.js')
 
 class board {
-    constructor(player) {
-        this.player = player;
+    constructor() {
         this.spaces = []
-        this.spaces[0] = new Chance_Card(true, this.player, 200);
+        this.spaces[0] = new Chance_Card(true, 200);
         this.spaces[1] = new Property({
             name:"Commuter Student Lounge", 
             price:60, color:"#8B4513",
@@ -23,7 +21,7 @@ class board {
             rent:[4, 20, 60, 180, 320, 450], 
             houseCost:50,
             mortgage:30 });
-        this.spaces[4] = new Chance_Card(true, this.player, Math.max(Math.round(player.getMoney()) * -.2, -200)); //sends the value in that makes the player pay less (-200 or -20% of players money)
+        this.spaces[4] = new Chance_Card({special_condition:true, price:200}); //sends the value in that makes the player pay less (-200 or -20% of players money)
         /*
         Explanation: Instead of having a creating a whole class or function for the student loans spot, 
         lets just make it a method in Chance_Card that lets the user choose 10% or $200 (probably should
@@ -150,7 +148,7 @@ class board {
             rent:[24, 120, 360, 850, 1025, 1200], 
             houseCost:150,
             mortgage:140 });
-        this.spaces[30] = new Jail(); //send the player immediately to jail. This same object will be created when a player picks up a chance/comchest card that sends them to jail.
+        this.spaces[30] = new Community_Chest_Card({special_condition:true, position:40}); //send the player immediately to jail when they land here
         this.spaces[31] = new Property({
             name:"Kunsella Hall", 
             price:300, 
@@ -190,7 +188,7 @@ class board {
             mortgage:200 });
         this.spaces[40] = "In jail";
     }
-    landOn(space_number) {
+    landOn(player, space_number) {
         let space = this.spaces[space_number];
         if(space instanceof Property) {
             if(space.isOwned()) { //if the property is owned, make the player who landed here pay rent
@@ -204,10 +202,14 @@ class board {
             
         }
         else if(space instanceof Chance_Card) {
-            space.pullChanceCard(this.player); //implement pullChanceCard method for chancecard (Maybe do a chance deck class to instantiate the deck and shuffle)
+            if(space.special_condition) {
+                space.executeSpecialCondition(player, space.price)
+            } else {
+                space.pullChanceCard(player); //implement pullChanceCard method for chancecard (Maybe do a chance deck class to instantiate the deck and shuffle)
+            }
         }
         else if(space instanceof Community_Chest_Card) {
-            space.pullCommunityChestCard(this.player); //implement pullCommunityChestCard method for com chest (Maybe do a community chest deck class to instantiate the deck and shuffle)
+            space.pullCommunityChestCard(player); //implement pullCommunityChestCard method for com chest (Maybe do a community chest deck class to instantiate the deck and shuffle)
         }
         else if(space instanceof Railroad) {
             if(space.isOwned()) { //If the railroad is owned, make the play who landed here pay
@@ -229,8 +231,10 @@ class board {
                 }
             }
         }
-        else if(space instanceof Jail) {
-            space.sendToJail(this.player); //send this player to jail
+        else {
+            space.sendToJail(player); //send this player to jail
         }
     }
 }
+
+module.exports = board;

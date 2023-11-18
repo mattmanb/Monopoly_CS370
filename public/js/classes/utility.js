@@ -16,3 +16,4 @@ class utility {
     }
 
 }
+module.exports = utility;
