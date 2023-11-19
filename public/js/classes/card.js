@@ -1,12 +1,26 @@
+import { player } from './classes/player.js';
+
 export class Card {
     constructor(text, action) {
         this.text = text;
         this.action = action;
+    }
+
+    performAction(player) {
+        if(typeof this.action === 'function') {
+            this.action(player)
+        }
+        console.log(`Get a paid internship—Collect $${money}`);
 
     }
 
-    performAction() {
+    teleport(player, pos) {
+        passedGo(player);
+        player.setPosition(pos);
+    }
 
+    money(player,x) {
+        player.addMoney(x);
     }
 
     advanceGo(player) {

@@ -5,8 +5,8 @@ const socket = io(); // this player
 // Need to set as type module in HTML for this to work
 import { player } from './classes/player.js';
 import { property } from './classes/property.js'
-import { chance_card } from './classes/chance_card.js'
-import { community_chest_card } from './classes/community_chest_card.js'
+import { chance_card } from './classes/chance.js'
+import { community_chest_card } from './classes/community_chest.js'
 import { railroad } from './classes/railroad.js';
 import { utility } from './classes/utility.js';
 
@@ -36,6 +36,12 @@ function isDouble(dice1, dice2) {
         return true
     else
         return false
+}
+
+function passedGo(player, pos) {
+    if (player.getPosition() > pos) {
+        player.addMoney(200);
+    }
 }
 
 // Moves player certain number of spaces
@@ -242,10 +248,10 @@ function landOnSpace(player) {
     }
 
     if (board[space] instanceof community_chest) {  //define this
-        giveCommunityChestCard(player, communityChestGameDeck);
+        giveCommunityChestCard(player);
     }
     if (board[space] instanceof chance) {  //define this
-        giveChanceChestCard(player, chanceGameDeck);
+        giveChanceChestCard(player);
     }
 
     socket.emit('update-player', player);
