@@ -4,14 +4,13 @@
 //can't use import/export statements without making this a 'module'
 //this syntax works instead
 const Player = require('./public/js/classes/player.js');
-//i.e. const new_player = new Player({attr:value, attr2:value2, etc.})
 const Property = require('./public/js/classes/property.js');
 const Chance_Card = require('./public/js/classes/chance_card.js');
 const Community_Chest_Card = require('./public/js/classes/community_chest_card.js');
 const Railroad = require('./public/js/classes/railroad.js');
 const Utility = require('./public/js/classes/utility.js');
+const Avenue = require('./public/js/classes/avenue.js')
 const Board = require('./public/js/classes/board.js');
-const Jail = require('./public/js/classes/jail.js');
 
 const fs = require('fs');
 
@@ -55,16 +54,7 @@ io.on('connection', (socket) => {
         //emit the pieces to the front end
         socket.emit('pieces-list', backEndPieces);
         //initialize a player's data
-        backEndPlayers[socket.id] = {
-            name: null,
-            piece: null,
-            money: 1500,
-            position: 0,
-            inJail: false,
-            outOfJailCards: 0,
-            turnsInJail: 0,
-            playerNumber: Math.min(...availablePlayers)
-        };
+        backEndPlayers[socket.id] = new Player({playerNumber: Math.min(...availablePlayers)});
         //get an instance of the new player
         backEndPlayer = backEndPlayers[socket.id];
 
@@ -161,3 +151,7 @@ setInterval(() => {
 server.listen(port, () => {
     console.log(`Server listening on port ${port}`)
 });
+
+/* BEGIN MONOPOLY GAMEFLOW */
+// board object with all board spaces and a ton of data
+let board = new Board();

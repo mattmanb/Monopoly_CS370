@@ -1,6 +1,13 @@
 // community chest class
 class community_chest_card {
-
+    constructor(special_condition = false, position = null) {
+        this.special_condition = special_condition;
+        this.position = position
+    }
+    executeSpecialCondition(player) {
+        player.setPosition(this.position);
+    }
+    /* Note: this function will instantiate a new communityChestDeck every time a card is drawn, which is flawed logic (cards will get reused before going through the deck) */
     //This function gives the player a card from the community chest deck
     giveCommunityChestCard(player, communityChestGameDeck) {
         const communityChestDeck = [
@@ -38,3 +45,4 @@ class community_chest_card {
 
 }
 
+module.exports = community_chest_card;
