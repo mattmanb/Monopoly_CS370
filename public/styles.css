@@ -472,6 +472,7 @@ h6 {
   overflow-x:hidden;
   min-width: 100px;
   min-height: 100px;
+  z-index: 100;
 }
 
 #dragHandle {
