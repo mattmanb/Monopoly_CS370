@@ -48,6 +48,11 @@ var backEndPieces = ["Thimble", "Shoe", "Top Hat",
 
 var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
 
+// Vars for checking who's turn it is
+var turnOrder = {};
+var currentPlayerTurn = 1;
+var diceRolled = false ;
+
 io.on('connection', (socket) => {
     console.log('a user connected');
     if(availablePlayers.length > 0) {
@@ -133,6 +138,81 @@ io.on('connection', (socket) => {
             } else {
                 socket.emit('msg-incoming', msg);
             }
+        });
+
+        socket.on('start-game', () => {
+            i = 0 ;
+            // Set turn order (still need to randomize it, for now it is default order 1-8)
+            for (const[key, value] of Object.entries(backEndPlayers)) {
+                turnOrder[i] = value.playerNumber ;
+                i++
+            }
+            // Send alert to whoevers turn it is
+            io.to(Object.keys(backEndPlayers)[currentPlayerTurn]).emit('player-alert', 'Your turn!')
+            console.log(turnOrder);
+        });
+
+        socket.on('roll-dice', () => {
+            // Check if it is this players turn
+            if(backEndPlayers[socket.id].playerNumber == turnOrder[currentPlayerTurn]) {
+                // Check if player already rolled this turn
+                if(!diceRolled) {
+                    console.log("It is this players turn")
+                    // Rolls dice and stores info in array (bool rolledDoubles, int numDoubles, int diceTotal, int currentPosition)
+                    rollInfo = backEndPlayers[socket.id].rollAndMove(0, board) ;
+                    // While doubles are being rolled
+                    while (rollInfo[0]) {
+                        if (rollInfo[1] < 3) {
+                            socket.emit('player-alert', `You rolled ${rollInfo[2]}. Doubles, roll again! Your position is ${rollInfo[3]}.`)
+                            rollInfo = backEndPlayers[socket.id].rollAndMove(rollInfo[1], board) ;
+                        }
+                        else {
+                            socket.emit('player-alert', '3 doubles! Go to jail!')
+                            break
+                        }
+                    }
+                    socket.emit('player-alert', `You rolled ${rollInfo[2]}. Your position is ${rollInfo[3]}.`)
+                    diceRolled = true ;
+                }
+                else {
+                    socket.emit('player-alert', "You have finished rolling this turn.")
+                }
+            }
+            else {
+                socket.emit('player-alert', "It is not your turn yet!")
+            }
+        });
+
+        socket.on('end-turn', () => {
+            var turnChanged = false;
+            // Check if it is this players turn
+            if(backEndPlayers[socket.id].playerNumber == turnOrder[currentPlayerTurn]) {
+                // Check if they have rolled yet
+                if(diceRolled) {
+                    // Ends turn and sets turn to whoever is next in line
+                    socket.emit('player-alert', "Your turn is now over.")
+                    if (currentPlayerTurn >= Object.keys(turnOrder).length - 1) {
+                        currentPlayerTurn = 0;
+                    }
+                    else {
+                        currentPlayerTurn += 1;
+                    }
+                    diceRolled = false;
+                    turnChanged = true;
+                }
+                else {
+                    socket.emit('player-alert', "You haven't rolled yet!")
+                }
+            }
+            else {
+                socket.emit('player-alert', "It is not your turn yet!")
+            }
+
+            // Send alert to whoever's turn it is right now if turn changed
+            if(turnChanged) {
+                io.to(Object.keys(backEndPlayers)[currentPlayerTurn]).emit('player-alert', 'Your turn!')
+            }
+
         });
 
         console.log(backEndPlayers);

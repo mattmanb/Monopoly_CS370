@@ -441,6 +441,18 @@ h6 {
   align-items: center;
 }
 
+.rollButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.endTurnButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .pill {
   font-size: 20px;
   padding: 0.5em, 1em;

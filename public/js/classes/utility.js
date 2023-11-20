@@ -28,6 +28,12 @@ class utility {
         player.addMoney(-1*amountOwed);
         return;
     }
+    queryPurchase() {
+        // empty function for now
+    }
+    startAuction() {
+        // empty function for now
+    }
 
 }
 module.exports = utility;

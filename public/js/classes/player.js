@@ -25,7 +25,7 @@ class player {
         //method to handle bankrupcy
     }
     movePlayer(numSpaces) {
-        this.currentPosition = this.currentPosition() + numSpaces;
+        this.currentPosition = this.currentPosition + numSpaces;
         if (this.currentPosition >= 40) {
             this.currentPosition = this.currentPosition - 40;
             this.money += 200;
@@ -47,13 +47,15 @@ class player {
         else
             return false
     }
-    rollAndMove(numDoubles = 0) { //set default numDoubles to 0 (if a number gets passed in the default gets overridden)
+    rollAndMove(numDoubles = 0, board) { //set default numDoubles to 0 (if a number gets passed in the default gets overridden)
         // Roll 2 dice
         var dice1 = this.rollDice()
         var dice2 = this.rollDice()
 
+        var rolledDoubles = this.isDouble(dice1, dice2)
+
         // Check if dice were doubles
-        if (this.isDouble(dice1,dice2)) {
+        if (rolledDoubles) {
 
             // If yes, increment numDoubles
             // Check if numDoubles >= 3
@@ -71,14 +73,20 @@ class player {
         console.log(`Player position: ${this.currentPosition}`);
 
         // Land on that space and do appropriate action
-        landOnSpace(this, this.currentPosition);
+        board.landOn(this, this.currentPosition);
+
+        return [rolledDoubles, numDoubles, diceTotal, this.currentPosition] ;
+
+        /* Changed it from recursive function to returning array in order to allow for alerts to be sent
 
         // If dice are not doubles, exit function
         if (!rolledDoubles) {
             return
         } else {
-            this.rollAndMove(numDoubles); //recursive way to handle amount of doubles rolled
+            this.rollAndMove(numDoubles, board); //recursive way to handle amount of doubles rolled
         }
+
+        */
     }
     goToJail() {
         this.inJail = true;

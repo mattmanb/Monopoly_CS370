@@ -48,6 +48,9 @@ class chance_card {
 
         return cardDelt;
     }
+    pullChanceCard(player) {
+        // empty function for now
+    }
     
 }
 

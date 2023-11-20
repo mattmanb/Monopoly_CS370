@@ -42,6 +42,9 @@ class community_chest_card {
             player.outOfJailCards++;
         return cardDelt;
     }
+    pullCommunityChestCard(player) {
+        // empty function for now
+    }
 
 }
 
