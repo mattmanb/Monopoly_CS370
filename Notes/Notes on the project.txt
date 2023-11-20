@@ -1,11 +1,15 @@
 Methods we need to implement ( class - method - desc (return type) )
 
 player - bankrupt() - handle if the player goes bankrupt
+player - buyHouse() - needs to highlight what properties a player
+					  can place a house on
 
 DONE property - isOwned() - returns if the property is owned (boolean)
-property - payRent(player) - makes the player pay rent (void)
+DONE property - payRent(player) - makes the player pay rent (void)
 property - queryPurchase(player) - asks the player if they want to buy the property and handles the decision (void)
 property - startAuction() - begins an auction for the property
+property - calcRentLevel() - determines rent level (no houses, 1-4 houses, hotel)
+property - addHouse()
 
 chance_card - pullChanceCard(player) - pulls a chance card from the deck and handles the outcome to the player (void)
 
@@ -13,16 +17,13 @@ community_chest_card - pullCommunityChestCard(player) - pulls a community chest 
 
 DONE railroad - isOwned() - returns if the railroad is owned (boolean)
 DONE railroad - payRent(player) - makes the player pay rent (void)
-In Progress - railroad - queryPurchase(player) - asks the player if they want to buy the railroad and handles the decision (void)
+railroad - queryPurchase(player) - asks the player if they want to buy the railroad and handles the decision (void)
 railroad - startAuction() - begins an auction for the railroad
 
 DONE utility - isOwned() - returns if the utility is owned (boolean)
-utility - payRent(player) - makes the player pay rent (void)
+DONE utility - payRent(player) - makes the player pay rent (void)
 utility - queryPurchase(player) - asks the player if they want to buy the utility
 utility - startAuction() - begins an auction for the utility
-
-DONE jail - sendToJail(player) - sends a player to jail and handles accordingly
-NOT exactly sure how we should handle jail
 
 COMMIT 11/18
 - Removing jail.js (jail gets handled using player methods)

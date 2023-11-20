@@ -9,6 +9,9 @@ class player {
         this.outOfJailCards = outOfJailCards;
         this.turnsInJail = turnsInJail;
         this.playerNumber = playerNumber;
+        this.properties = [];
+        this.railroads = [];
+        this.utilities = [];
     }
 
     addMoney(money) {

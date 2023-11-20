@@ -14,6 +14,20 @@ class utility {
             return false;
         }
     }
+    payRent(player, diceTotal) {
+        if(player === this.owner) {
+            console.log("Welcome to your property!");
+            return;
+        }
+        let amountOwed = 0;
+        if(this.owner.utilities.length === 2) {
+            amountOwed = diceTotal * 10;
+        } else if(this.owner.utilities.length === 1) {
+            amountOwed = diceTotal * 4;
+        }
+        player.addMoney(-1*amountOwed);
+        return;
+    }
 
 }
 module.exports = utility;
