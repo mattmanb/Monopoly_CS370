@@ -5,15 +5,12 @@ class chance_card {
         this.special_condition = special_condition;
         this.player = player;
         this.price = price;
-        if(this.special_condition) {
-            executeSpecialCondition(this.player, this.price)
-        }
     }
-    executeSpecialCondition(player, price) {
-        if(price === 200) {
+    executeSpecialCondition(player) {
+        if(this.price === 200) {
             player.addMoney(Math.max(-200, player.money*-.2))
         } else {
-            player.addMoney(price); //add or subtract based on the price
+            player.addMoney(this.price); //add or subtract based on the price
         }
         return;
     }

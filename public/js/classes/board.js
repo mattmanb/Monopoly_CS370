@@ -35,7 +35,7 @@ class board {
             avenue: this.avenues[0] });
         this.avenues[0].addProperty(this.spaces[3]);
 
-        this.spaces[4] = new Chance_Card({special_condition:true, price:200}); //sends the value in that makes the player pay less (-200 or -20% of players money)
+        this.spaces[4] = new Chance_Card({special_condition:true, price:-200}); //sends the value in that makes the player pay less (-200 or -20% of players money)
         /*
         Explanation: Instead of having a creating a whole class or function for the student loans spot, 
         lets just make it a method in Chance_Card that lets the user choose 10% or $200 (probably should
@@ -306,13 +306,18 @@ class board {
         }
         else if(space instanceof Chance_Card) {
             if(space.special_condition) {
-                space.executeSpecialCondition(player, space.price)
+                space.executeSpecialCondition(player)
             } else {
                 space.pullChanceCard(player); //implement pullChanceCard method for chancecard (Maybe do a chance deck class to instantiate the deck and shuffle)
             }
         }
         else if(space instanceof Community_Chest_Card) {
-            space.pullCommunityChestCard(player); //implement pullCommunityChestCard method for com chest (Maybe do a community chest deck class to instantiate the deck and shuffle)
+            if(space.special_condition) {
+                space.executeSpecialCondition(player);
+            } else {
+                space.pullCommunityChestCard(player); 
+                //implement pullCommunityChestCard method for com chest (Maybe do a community chest deck class to instantiate the deck and shuffle)
+            }
         }
         else if(space instanceof Railroad) {
             if(space.isOwned()) { //If the railroad is owned, make the play who landed here pay

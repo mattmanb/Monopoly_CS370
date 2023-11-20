@@ -4,7 +4,12 @@
 //can't use import/export statements without making this a 'module'
 //this syntax works instead
 const Player = require('./public/js/classes/player.js');
-
+const Property = require('./public/js/classes/property.js');
+const Chance_Card = require('./public/js/classes/chance_card.js');
+const Community_Chest_Card = require('./public/js/classes/community_chest_card.js');
+const Railroad = require('./public/js/classes/railroad.js');
+const Utility = require('./public/js/classes/utility.js');
+const Avenue = require('./public/js/classes/avenue.js')
 const Board = require('./public/js/classes/board.js');
 
 const fs = require('fs');
