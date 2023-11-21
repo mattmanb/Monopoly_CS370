@@ -102,6 +102,16 @@ $('#app').on('click', '#back_to_home', () => {
     socket.emit('load-page', ("lobby"));
 })
 
+$('#app').on('click', '#roll_dice', () => {
+    console.log("Roll dice button pressed.");
+    socket.emit('roll-dice') ;
+})
+
+$('#app').on('click', '#end_turn', () => {
+    console.log("End turn button pressed.");
+    socket.emit('end-turn') ;
+})
+
 function startGame() {
     const host = getLowestPlayerNumber();
     // if(frontEndPlayers[socket.id].playerNumber == host && validateStart() && Object.keys(frontEndPlayers).length > 1) {
@@ -115,6 +125,7 @@ function startGame() {
         alert("All players must enter a name and choose their piece!");
     } else {
         socket.emit('load-page', ("board"));
+        socket.emit('start-game');
     }
 }
 

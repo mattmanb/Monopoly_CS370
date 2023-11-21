@@ -39,5 +39,8 @@ class property{ //color to be implemented in street.js
         // uses isMonopoly method from the avenue class this property is apart of
         return this.avenue.isMonopoly();
     }
+    startAuction() {
+        // empty function for now
+    }
 }
 module.exports = property;

@@ -23,6 +23,12 @@ class railroad {
         }
         return;
     }
+    queryPurchase() {
+        // empty function for now
+    }
+    startAuction() {
+        // empty function for now
+    }
 
 }
 module.exports = railroad;

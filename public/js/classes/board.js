@@ -295,9 +295,9 @@ class board {
         let space = this.spaces[space_number];
         if(space instanceof Property) {
             if(space.isOwned()) { //if the property is owned, make the player who landed here pay rent
-                space.payRent(this.player);
+                space.payRent(player);
             } else { //otherwise, see if the player wants to buy it (if not, start an auction)
-                space.queryPurchase(this.player); //see if the player wants to buy the property
+                space.queryPurchase(player); //see if the player wants to buy the property
                 if(!space.isOwned()) {
                     space.startAuction();
                 }
@@ -321,9 +321,9 @@ class board {
         }
         else if(space instanceof Railroad) {
             if(space.isOwned()) { //If the railroad is owned, make the play who landed here pay
-                space.payRent(this.player);
+                space.payRent(player);
             } else {//Otherwise, see if the player wants to buy the railroad
-                space.queryPurchase(this.player);
+                space.queryPurchase(player);
                 if(!space.isOwned()) { //if the railroad isn't purchased, start an auction for it
                     space.startAuction();
                 }
@@ -331,16 +331,17 @@ class board {
         }
         else if(space instanceof Utility) {
             if(space.isOwned()) {
-                space.payRent(this.player);
+                space.payRent(player);
             } else {
-                space.queryPurchase(this.player);
+                space.queryPurchase(player);
                 if(!space.isOwned()) {
                     space.startAuction();
                 }
             }
         }
         else {
-            space.sendToJail(player); //send this player to jail
+            // Commenting this out for now, sendToJail is called on just visiting space as well
+            // space.sendToJail(player); //send this player to jail
         }
     }
     isMonopoly(space_ind) {
