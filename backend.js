@@ -234,4 +234,4 @@ server.listen(port, () => {
 
 /* BEGIN MONOPOLY GAMEFLOW */
 // board object with all board spaces and a ton of data
-let board = new Board();
+const board = new Board();
