@@ -534,3 +534,9 @@ h1 {
 .draggable {
   user-select: none;
 }
+
+.parent{
+  display: grid;
+  grid-gap: 1px;
+  
+}
