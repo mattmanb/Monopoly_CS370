@@ -2,10 +2,12 @@
 
 class utility {
     constructor({name, price, mortgage}) {
-        this.name = name
-        this.price = price
-        this.mortgage = mortgage
-        this.owner = null
+        this.name = name;
+        this.price = price;
+        this.mortgage = mortgage;
+        this.owner = null;
+        this.purchaseable = true;
+        this.type = "utility";
     }
     isOwned() {
         if(this.owner !== null) {
@@ -28,11 +30,8 @@ class utility {
         player.addMoney(-1*amountOwed);
         return;
     }
-    queryPurchase() {
-        // empty function for now
-    }
-    startAuction() {
-        // empty function for now
+    startAuction(io) {
+        io.emit('start-auction', this);
     }
 
 }
