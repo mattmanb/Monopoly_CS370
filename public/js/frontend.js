@@ -93,7 +93,6 @@ socket.on('update-content', (content) => {
 
 $('#app').on('click', '#startGameButton', () => {
     startGame();
-    inLobby = false;
 });
 
 $('#app').on('click', '#back_to_home', () => {
@@ -125,6 +124,7 @@ function startGame() {
     } else {
         socket.emit('load-page', ("board"));
         socket.emit('start-game');
+        inLobby = false;
     }
 }
 
@@ -306,21 +306,11 @@ socket.on('get-board-data', (BE_board) => {
     FE_board = BE_board;
 })
 
-socket.on('property-purchase', (propertyName, propertyPrice) => {
+socket.on('land-purchase', (propertyName, propertyPrice) => {
     console.log(`Would you like to purchase ${propertyName} for ${propertyPrice}?`);
     const msg = `Would you like to purchase ${propertyName} for ${propertyPrice}?`;
     const response = confirm(msg);
     socket.emit('purchase-decision', propertyName, response);
-});
-socket.on('railroad-purchase', (railroadName, railroadPrice) => {
-    const msg = `Would you like to purchase ${railroadName} for ${railroadPrice}?`;
-    const response = confirm(msg);
-    socket.emit('purchase-decision', railroadName, response);
-});
-socket.on('utility-purchase', (utilityName, utilityPrice) => {
-    const msg = `Would you like to purchase ${utilityName} for ${utilityPrice}?`;
-    const response = confirm(msg);
-    socket.emit('purchase-decision', utilityName, response);
 });
 
 socket.on('start-auction', (property) => {

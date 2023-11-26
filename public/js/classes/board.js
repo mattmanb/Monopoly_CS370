@@ -325,18 +325,10 @@ class board {
         if(space instanceof Property) {
             if(space.isOwned()) { //if the property is owned, make the player who landed here pay rent
                 space.payRent(player);
-            } else { //otherwise, see if the player wants to buy it (if not, start an auction)
-                // console.log("before query purchase");
-                // space.queryPurchase(player, socket); //see if the player wants to buy the property
-                // console.log("after query purchase");
-                // if(!space.isOwned()) {
-                //     console.log("before auction");
-                //     space.startAuction(this.io);
-                //     console.log("after auction");
-                // }
-                console.log("Query purchase SHOULD be called");
+            } else {
+                console.log("Property is not owned");
             }
-            
+    
         }
         else if(space instanceof Chance_Card) {
             if(space.special_condition) {
@@ -356,21 +348,15 @@ class board {
         else if(space instanceof Railroad) {
             if(space.isOwned()) { //If the railroad is owned, make the play who landed here pay
                 space.payRent(player);
-            } else {//Otherwise, see if the player wants to buy the railroad
-                // space.queryPurchase(player, socket);
-                // if(!space.isOwned()) { //if the railroad isn't purchased, start an auction for it
-                //     space.startAuction(this.io);
-                // }
+            } else {
+                console.log("Railroad is not owned");
             }
         }
         else if(space instanceof Utility) {
             if(space.isOwned()) {
                 space.payRent(player);
             } else {
-                // space.queryPurchase(player, socket);
-                // if(!space.isOwned()) {
-                //     space.startAuction(this.io);
-                // }
+                console.log("Utility is not owned");
             }
         }
         else {

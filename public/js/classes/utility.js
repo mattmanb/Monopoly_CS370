@@ -6,7 +6,6 @@ class utility {
         this.price = price;
         this.mortgage = mortgage;
         this.owner = null;
-        this.purchaseable = true;
         this.type = "utility";
     }
     isOwned() {
@@ -30,8 +29,8 @@ class utility {
         player.addMoney(-1*amountOwed);
         return;
     }
-    startAuction(io) {
-        io.emit('start-auction', this);
+    startAuction() {
+        //placeholder
     }
 
 }
