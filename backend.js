@@ -50,6 +50,7 @@ var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
 
 // Vars for checking who's turn it is
 var turnOrder = [];
+var numDoubles = 0;
 var currentPlayerTurn = 1;
 var diceRolled = false ;
 
@@ -160,6 +161,23 @@ io.on('connection', (socket) => {
                     console.log("It is this players turn");
                     // Rolls dice and stores info in array (bool rolledDoubles, int numDoubles, int diceTotal, int currentPosition)
                     rollInfo = backEndPlayers[socket.id].rollAndMove(0, board, socket);
+
+                    // Checking if doubles were rolled
+
+                    numDoubles = rollInfo[1];
+
+                    if (!rollInfo[0]) {
+                        socket.emit('player-alert', `You rolled ${rollInfo[2]}. Your position is ${rollInfo[3]}.`);
+                        diceRolled = true;
+                    }
+                    else if (numDoubles < 3) {
+                        socket.emit('player-alert', `You rolled ${rollInfo[2]}. Doubles, roll again! Your position is ${rollInfo[3]}.`);
+                    }
+                    else {
+                        socket.emit('player-alert', '3 doubles! Go to jail!');
+                        diceRolled = true;
+                    }
+
                     space = Object.assign({}, board.spaces[rollInfo[3]]);
                     if (space.purchaseable) {
                         console.log("Space is purchaseable");
@@ -175,7 +193,9 @@ io.on('connection', (socket) => {
                             socket.emit('utility-purchase', space.name, space.price);
                         }
                     }
-                    // While doubles are being rolled
+
+                    /*
+
                     while (rollInfo[0]) {
                         if (rollInfo[1] < 3) {
                             socket.emit('player-alert', `You rolled ${rollInfo[2]}. Doubles, roll again! Your position is ${rollInfo[3]}.`);
@@ -197,9 +217,13 @@ io.on('connection', (socket) => {
                             socket.emit('player-alert', '3 doubles! Go to jail!');
                             break;
                         }
+
+                        
                     }
                     socket.emit('player-alert', `You rolled ${rollInfo[2]}. Your position is ${rollInfo[3]}.`);
                     diceRolled = true;
+
+                    */
                 }
                 else {
                     socket.emit('player-alert', "You have finished rolling this turn.")
