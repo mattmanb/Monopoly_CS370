@@ -6,7 +6,6 @@ class railroad {
         this.price = price;
         this.mortgage = mortgage;
         this.owner = null;
-        this.purchaseable = true;
         this.type = "railroad";
     }
     isOwned() {
@@ -25,8 +24,8 @@ class railroad {
         }
         return;
     }
-    startAuction(io) {
-        io.emit('start-auction', this);
+    startAuction() {
+        //placeholder
     }
 
 }
