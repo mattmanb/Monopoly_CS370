@@ -48,6 +48,8 @@ var backEndPieces = ["Thimble", "Shoe", "Top Hat",
 
 var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
 
+var inLobby = true;
+
 // Vars for checking who's turn it is
 var turnOrder = [];
 var numDoubles = 0;
@@ -56,7 +58,7 @@ var diceRolled = false ;
 
 io.on('connection', (socket) => {
     console.log('a user connected');
-    if(availablePlayers.length > 0) {
+    if(availablePlayers.length > 0 && inLobby) {
         //emit the pieces to the front end
         socket.emit('pieces-list', backEndPieces);
         //initialize a player's data
@@ -130,6 +132,9 @@ io.on('connection', (socket) => {
                     io.emit('update-content', data);
                 }
             })
+            if(page === "board") {
+                inLobby = false;
+            }
         });
 
         socket.on('send-message', (senderID, msg) => {
@@ -142,6 +147,7 @@ io.on('connection', (socket) => {
         });
 
         socket.on('start-game', () => {
+            inLobby = false;
             i = 0 ;
             // Set turn order (still need to randomize it, for now it is default order 1-8)
             for (const[key, value] of Object.entries(backEndPlayers)) {
@@ -161,6 +167,7 @@ io.on('connection', (socket) => {
                     console.log("It is this players turn");
                     // Rolls dice and stores info in array (bool rolledDoubles, int numDoubles, int diceTotal, int currentPosition)
                     rollInfo = backEndPlayers[socket.id].rollAndMove(0, board, socket);
+                    space = board.spaces[rollInfo[3]];
 
                     // Checking if doubles were rolled
 
@@ -178,57 +185,17 @@ io.on('connection', (socket) => {
                         diceRolled = true;
                     }
 
-                    space = Object.assign({}, board.spaces[rollInfo[3]]);
-                    if (space.purchaseable) {
-                        console.log("Space is purchaseable");
-                        console.log("Attempting socket emit...", space.name, space.price);
-                        if(space.type === "property") {
-                            console.log("Space is a property");
-                            socket.emit('property-purchase', space.name, space.price);
-                        } else if(space.type === "railroad") {
-                            console.log("Space is a railroad");
-                            socket.emit('railroad-purchase', space.name, space.price);
-                        } else if(space.type === "utility") {
-                            console.log("Space is a utility");
-                            socket.emit('utility-purchase', space.name, space.price);
-                        }
-                    }
-
-                    /*
-
-                    while (rollInfo[0]) {
-                        if (rollInfo[1] < 3) {
-                            socket.emit('player-alert', `You rolled ${rollInfo[2]}. Doubles, roll again! Your position is ${rollInfo[3]}.`);
-                            rollInfo = backEndPlayers[socket.id].rollAndMove(rollInfo[1], board, socket);
-                            space = Object.assign({}, board.spaces[rollInfo[3]]);
-                            if (space.purchaseable) {
-                                console.log("Space is purchaseable");
-                                console.log("Attempting socket emit...", space);
-                                if(space instanceof Property) {
-                                    socket.emit('property-purchase', space);
-                                } else if(space instanceof Railroad) {
-                                    socket.emit('railroad-purchase', space);
-                                } else if(space instanceof Utility) {
-                                    socket.emit('utility-purchase', space);
-                                }
-                            }
-                        }
-                        else {
-                            socket.emit('player-alert', '3 doubles! Go to jail!');
-                            break;
-                        }
-
-                        
-                    }
-                    socket.emit('player-alert', `You rolled ${rollInfo[2]}. Your position is ${rollInfo[3]}.`);
-                    diceRolled = true;
-
-                    */
-                }
+                    if (space instanceof Property || space instanceof Railroad || space instanceof Utility) {
+                        console.log("Space is a purchaseable");
+                        socket.emit('land-purchase', space.name, space.price);
+                    } 
+                } 
+                // If player already rolled this turn
                 else {
                     socket.emit('player-alert', "You have finished rolling this turn.")
                 }
-            }
+            } 
+            // If it is not this players turn
             else {
                 socket.emit('player-alert', "It is not your turn yet!")
             }
@@ -237,23 +204,19 @@ io.on('connection', (socket) => {
         socket.on('purchase-decision', (spaceName, response) => {
             //get the actual object
             space = board.getSpaceByName(spaceName);
+            console.log("Fetched space from the name", space);
             //if the response to buying this property/railroad/utility is YES (true)
             if(response) {
                 //set the space's owner to this socket
                 space.owner = backEndPlayers[socket.id];
                 //subtract the price from the players inventory
                 backEndPlayers[socket.id].addMoney(space.price * -1);
-                //add the property/railroad/utility to the player's inventory
-                if(space instanceof Property) {
-                    backEndPlayers[socket.id].properties.push(space);
-                } else if(space instanceof Railroad) {
-                    backEndPlayers[socket.id].railroads.push(space);
-                } else if(space instanceof Utility) {
-                    backEndPlayers[socket.id].utilities.push(space);
-                }
                 //log the info
                 console.log(`${backEndPlayers[socket.id].name} has purchased ${space.name}!`);
+                console.log(`The owner of ${space.name} is ${space.owner.name}.`);
             } else {
+                console.log(`${backEndPlayers[socket.id].name} has declined to purchase ${space.name}.`);
+                console.log("Starting auction...");
                 space.startAuction();
             }
         });

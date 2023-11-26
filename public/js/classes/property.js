@@ -12,7 +12,6 @@ class property{ //color to be implemented in street.js
         this.mortgage = mortgage;
         this.owner = null;
         this.avenue = avenue; //what avenue this property is a part of
-        this.purchaseable = true;
         this.type = "property";
     }
     isOwned() {
