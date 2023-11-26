@@ -47,12 +47,12 @@ class player {
         else
             return false
     }
-    rollAndMove(numDoubles = 0, board) { //set default numDoubles to 0 (if a number gets passed in the default gets overridden)
+    rollAndMove(numDoubles = 0, board, socket) { //set default numDoubles to 0 (if a number gets passed in the default gets overridden)
         // Roll 2 dice
-        var dice1 = this.rollDice()
-        var dice2 = this.rollDice()
+        const dice1 = this.rollDice()
+        const dice2 = this.rollDice()
 
-        var rolledDoubles = this.isDouble(dice1, dice2)
+        const rolledDoubles = this.isDouble(dice1, dice2)
 
         // Check if dice were doubles
         if (rolledDoubles) {
@@ -73,20 +73,9 @@ class player {
         console.log(`Player position: ${this.currentPosition}`);
 
         // Land on that space and do appropriate action
-        board.landOn(this, this.currentPosition);
+        board.landOn(this, this.currentPosition, socket);
 
         return [rolledDoubles, numDoubles, diceTotal, this.currentPosition] ;
-
-        /* Changed it from recursive function to returning array in order to allow for alerts to be sent
-
-        // If dice are not doubles, exit function
-        if (!rolledDoubles) {
-            return
-        } else {
-            this.rollAndMove(numDoubles, board); //recursive way to handle amount of doubles rolled
-        }
-
-        */
     }
     goToJail() {
         this.inJail = true;
