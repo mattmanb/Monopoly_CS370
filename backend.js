@@ -58,6 +58,7 @@ var currentPlayerTurn = 0;
 var diceRolled = false ;
 
 io.on('connection', (socket) => {
+    // ########################### Lobby Handling ########################### //
     console.log('a user connected');
     if(availablePlayers.length > 0 && inLobby) {
         //emit the pieces to the front end
@@ -74,6 +75,8 @@ io.on('connection', (socket) => {
         // send new player data to the front end
         io.emit('updateLobby', backEndPlayers); //emit to the front end; a new player joined
 
+        //lobby logic
+
         // front end post to notify the backend that a user disconnected
         socket.on('disconnect', (reason) => {
             console.log("disconnected...", reason);
@@ -84,7 +87,6 @@ io.on('connection', (socket) => {
             }
             delete backEndPlayers[socket.id];
             io.emit('update-connected-players', availablePlayers);
-            io.emit('updateLobby', backEndPlayers);
         });
 
         // front end post to update a user's data
@@ -99,28 +101,14 @@ io.on('connection', (socket) => {
                 backEndPieces.splice(pieceInd, 1);
                 socket.emit('player-alert', `Name and piece updated!\nName: ${backEndPlayers[socket.id].name}\nPiece: ${backEndPlayers[socket.id].piece}`);
             }
-            
         });
 
         // front end request to update the pieces
         socket.on('fe-wants-pieces-updated', () => {
             io.emit('pieces-list', (backEndPieces));
-        })
-
-        //new data from a FE player
-        socket.on('update-player', (frontEndPlayer) => {
-            backEndPlayer = {
-                name: frontEndPlayer.name,
-                piece: frontEndPlayer.piece,
-                money: frontEndPlayer.money,
-                position: frontEndPlayer.currentPosition,
-                inJail: frontEndPlayer.inJail,
-                outOfJailCards: frontEndPlayer.outOfJailCards,
-                turnsInJail: frontEndPlayer.turnsInJail,
-                playerNumber: frontEndPlayer.playerNumber
-            };
-            io.emit('update-players', backEndPlayers);
         });
+
+        // ########################### Page Loading ########################### //
 
         //load in the page we want to display for SPA
         socket.on('load-page', async (page) => {
@@ -138,6 +126,8 @@ io.on('connection', (socket) => {
             }
         });
 
+        // ########################### Chat ########################### //
+
         socket.on('send-message', (senderID, msg) => {
             if(senderID !== null) {
                 msg = `${backEndPlayers[socket.id].name}: ${msg}`;
@@ -146,6 +136,12 @@ io.on('connection', (socket) => {
                 socket.emit('msg-incoming', msg);
             }
         });
+
+        socket.on('game-message', (msg) => {
+            io.emit('game-msg-incoming', msg);
+        });
+
+        // ########################### Gameflow (Turns, rolling dice, etc.) ########################### //
 
         socket.on('start-game', () => {
             inLobby = false;
@@ -212,43 +208,6 @@ io.on('connection', (socket) => {
             }
         });
 
-        socket.on('purchase-decision', (spaceName, response) => {
-            //get the actual object
-            space = board.getSpaceByName(spaceName);
-            console.log("Fetched space from the name", space);
-            //if the response to buying this property/railroad/utility is YES (true)
-            if(response) {
-                //set the space's owner to this socket
-                space.owner = backEndPlayers[socket.id];
-                //subtract the price from the players inventory
-                backEndPlayers[socket.id].addMoney(space.price * -1);
-                //log the info
-                console.log(`${backEndPlayers[socket.id].name} has purchased ${space.name}!`);
-                console.log(`The owner of ${space.name} is ${space.owner.name}.`);
-            } else {
-                console.log(`${backEndPlayers[socket.id].name} has declined to purchase ${space.name}.`);
-                console.log("Starting auction...");
-                startAuction(space);
-            }
-        });
-
-        socket.on('auction-bid', (spaceName, bid) => {
-            //get the actual object
-            space = board.getSpaceByName(spaceName);
-            //if the bid is greater than the current bid
-            if(bid > space.currentBid) {
-                //set the current bid to the new bid
-                space.currentBid = bid;
-                //set the current bidder to this socket
-                space.currentBidder = backEndPlayers[socket.id];
-                //log the info
-                console.log(`${backEndPlayers[socket.id].name} has bid ${bid} on ${space.name}!`);
-            } else {
-                console.log(`${backEndPlayers[socket.id].name} has bid ${bid} on ${space.name}.`);
-                console.log("That bid is too low!");
-            }
-        });
-
         socket.on('end-turn', () => {
             var turnChanged = false;
             // Check if it is this players turn
@@ -281,6 +240,69 @@ io.on('connection', (socket) => {
 
         });
 
+        // ########################### Buying Properties/Railroads/Utilities ########################### //
+
+        socket.on('purchase-decision', (spaceName, response) => {
+            //get the actual object
+            space = board.getSpaceByName(spaceName);
+            console.log("Fetched space from the name", space);
+            //if the response to buying this property/railroad/utility is YES (true)
+            if(response) {
+                //set the space's owner to this socket
+                space.owner = backEndPlayers[socket.id];
+                //subtract the price from the players inventory
+                backEndPlayers[socket.id].addMoney(space.price * -1);
+                //log the info
+                console.log(`${backEndPlayers[socket.id].name} has purchased ${space.name}!`);
+                console.log(`The owner of ${space.name} is ${space.owner.name}.`);
+            } else {
+                console.log(`${backEndPlayers[socket.id].name} has declined to purchase ${space.name}.`);
+                console.log("Starting auction...");
+                startAuction(space);
+            }
+        });
+
+        // ########################### Auction Stuff ########################### //
+
+        socket.on('bid', (auction_info) => {
+            //set the current bidder as the one who just bid
+            auction_info.currentBidderName = backEndPlayers[auction_info.bidOrder[auction_info.bidOrderInd]].name;
+            auction_info.currentBidderID = auction_info.bidOrder[auction_info.bidOrderInd];
+            //reset number of passes
+            auction_info.numPasses = 0;
+            //go to the next player in the order
+            auction_info.bidOrderInd+=1;
+            if(auction_info.bidOrderInd >= auction_info.bidOrder.length) {
+                auction_info.bidOrderInd = 0;
+            }
+            //query the user for their bid or pass
+            io.emit.to(auction_info.bidOrder[auction_info.bidOrderInd]).emit('your-bid', auction_info);
+        });
+
+        socket.on('bid-pass', (auction_info) => {
+            // Increment the number of passes
+            auction_info.numPasses += 1;
+            // Check if everyone has passed
+            if (auction_info.numPasses >= auction_info.bidOrder.length - 1 && auction_info.currentBidderID !== null) {
+                // End the auction
+                io.emit('auction-ended', auction_info);
+                setOwner(auction_info.spaceForAuction, auction_info.currentBidderID);
+            } else if(auction_info.numPasses == auction_info.bidOrder.length && auction_info.currentBidderID == null) {
+                // If everyone passes and no one has bid yet, the auction is over
+                io.emit('auction-ended', auction_info);
+            }
+            //edge case where everyone passes the bids (the last player won't be able to bid!)
+            else {
+                // Set the next bidder
+                auction_info.bidOrderInd += 1;
+                if (auction_info.bidOrderInd >= auction_info.bidOrder.length) {
+                    auction_info.bidOrderInd = 0;
+                }
+                // Send the next bid to the next bidder
+                io.to(auction_info.bidOrder[auction_info.bidOrderInd]).emit('your-bid', auction_info);
+            }
+        });
+
         console.log(backEndPlayers);
     } else {
         console.log("Max players in lobby.");
@@ -301,7 +323,35 @@ server.listen(port, () => {
 /* BEGIN MONOPOLY GAMEFLOW */
 // board object with all board spaces and a ton of data
 const board = new Board(io);
+var currentBid = 0;
 
 function startAuction(space) {
-    
+    // Start the auction
+    io.emit('auction-started', space.name, space.price);
+    // Set the bid order (everyone except the person who started the auction)
+    turnOrderCopy = [...turnOrder];
+    bidOrder = turnOrderCopy.slice(currentPlayerTurn+1, turnOrder.length).concat(0, currentPlayerTurn);
+    // Set the auction info object
+    let auction_info = {
+        spaceForAuction: space.name,
+        currentBid: space.price,
+        bidOrder: bidOrder,
+        bidOrderInd: 0,
+        // the bidder name and id are the player who currently has the highest bid
+        currentBidderName: null,
+        currentBidderID: null,
+        numPasses: 0, 
+        auctionStarterID: turnOrder[currentPlayerTurn]
+    };
+    io.to(auction_info.bidOrder[auction_info.bidOrderInd]).emit('your-bid', auction_info);
+}
+
+function setOwner(spaceName, ownerID) {
+    space = getSpaceByName(spaceName);
+    space.owner = backEndPlayers[ownerID];
+    return;
+}
+// ########################### Misc ########################### //
+function sendGameMsg(msg) {
+    io.emit('game-msg-incoming', msg);
 }

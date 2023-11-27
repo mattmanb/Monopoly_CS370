@@ -95,11 +95,6 @@ $('#app').on('click', '#startGameButton', () => {
     startGame();
 });
 
-$('#app').on('click', '#back_to_home', () => {
-    inLobby = true;
-    socket.emit('load-page', ("lobby"));
-})
-
 $('#app').on('click', '#roll_dice', () => {
     console.log("Roll dice button pressed.");
     socket.emit('roll-dice') ;
@@ -308,11 +303,53 @@ socket.on('get-board-data', (BE_board) => {
 
 socket.on('land-purchase', (propertyName, propertyPrice) => {
     console.log(`Would you like to purchase ${propertyName} for ${propertyPrice}?`);
-    const msg = `Would you like to purchase ${propertyName} for ${propertyPrice}?`;
-    const response = confirm(msg);
-    socket.emit('purchase-decision', propertyName, response);
+    // const msg = `Would you like to purchase ${propertyName} for ${propertyPrice}?`;
+    // const response = confirm(msg);
+    const modalContent = createPurchaseModal(propertyName, propertyPrice);
+    $('#modal').append(modalContent);
+    $('#modal').css('visibility', 'visible');
+    $('#purchase-yes').on('click', () => {
+        socket.emit('purchase-decision', propertyName, true);
+        $('#modal').hide();
+    });
+    $('#purchase-no').on('click', () => {
+        socket.emit('purchase-decision', propertyName, false);
+        $('#modal').hide();
+    });
 });
 
-socket.on('start-auction', (property) => {
-    alert(`Auction for ${property.name} has started!`);
+// ########################### Modals (Pop-ups) ########################### //
+
+function createPurchaseModal(spaceName, propertyPrice) {
+    const modalContent = $('<div>').addClass('modal-content');
+    const message = $('<p>').text(`Would you like to purchase ${spaceName} for ${propertyPrice}?`);
+    const yesButton = $('<button>').text('Buy').attr('id', 'purchase-yes');
+    const noButton = $('<button>').text('Pass').attr('id', 'purchase-no');
+
+    modalContent.append(message, yesButton, noButton);
+
+    return modalContent;
+}
+
+socket.on('auction-started', (spaceName, spacePrice) => {
+    alert(`Auction for ${spaceName} has started!\nStarting bid is ${spacePrice}`);
+});
+
+socket.on('your-bid', (auction_info) => {
+    const bid = prompt(`Enter a bid higher than ${auction_info.currentBid} or 0 to pass.`);
+    if (bid < auction_info.currentBid) {
+        socket.emit('bid-pass', auction_info);
+    } else {
+        auction_info.currentBid = bid;
+        socket.emit('bid', auction_info);
+    }
+    
+});
+
+socket.on('auction-ended', (auction_info) => {
+    if(auction_info.currentBidderID === null) {
+        alert(`No one bid on ${auction_info.propertyName}.\n Game continues...`);
+    } else {
+        alert(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`);
+    }
 });
