@@ -54,7 +54,7 @@ var inLobby = true;
 // Vars for checking who's turn it is
 var turnOrder = [];
 var numDoubles = 0;
-var currentPlayerTurn = 1;
+var currentPlayerTurn = 0;
 var diceRolled = false ;
 
 io.on('connection', (socket) => {
@@ -152,17 +152,27 @@ io.on('connection', (socket) => {
             i = 0 ;
             // Set turn order (still need to randomize it, for now it is default order 1-8)
             for (const[key, value] of Object.entries(backEndPlayers)) {
-                turnOrder[i] = value.playerNumber;
+                turnOrder[i] = key;
                 i++;
             }
+
+            // Randomize turn order
+            for (var a = turnOrder.length - 1; a > 0; a--) {
+                var b = Math.floor(Math.random() * (a + 1));
+                var temp = turnOrder[a];
+                turnOrder[a] = turnOrder[b];
+                turnOrder[b] = temp;
+            }
+
             // Send alert to whoevers turn it is
-            io.to(Object.keys(backEndPlayers)[currentPlayerTurn]).emit('player-alert', 'Your turn!')
+            //Object.keys(backEndPlayers)[currentPlayerTurn]
+            io.to(turnOrder[currentPlayerTurn]).emit('player-alert', 'Your turn!')
             console.log(turnOrder);
         });
 
         socket.on('roll-dice', () => {
             // Check if it is this players turn
-            if(backEndPlayers[socket.id].playerNumber == turnOrder[currentPlayerTurn]) {
+            if(socket.id == turnOrder[currentPlayerTurn]) {
                 // Check if player already rolled this turn
                 if(!diceRolled) {
                     console.log("It is this players turn");
@@ -242,12 +252,12 @@ io.on('connection', (socket) => {
         socket.on('end-turn', () => {
             var turnChanged = false;
             // Check if it is this players turn
-            if(backEndPlayers[socket.id].playerNumber == turnOrder[currentPlayerTurn]) {
+            if(socket.id == turnOrder[currentPlayerTurn]) {
                 // Check if they have rolled yet
                 if(diceRolled) {
                     // Ends turn and sets turn to whoever is next in line
                     socket.emit('player-alert', "Your turn is now over.")
-                    if (currentPlayerTurn >= Object.keys(turnOrder).length - 1) {
+                    if (currentPlayerTurn >= turnOrder.length - 1) {
                         currentPlayerTurn = 0;
                     }
                     else {
@@ -266,7 +276,7 @@ io.on('connection', (socket) => {
 
             // Send alert to whoever's turn it is right now if turn changed
             if(turnChanged) {
-                io.to(Object.keys(backEndPlayers)[currentPlayerTurn]).emit('player-alert', 'Your turn!')
+                io.to(turnOrder[currentPlayerTurn]).emit('player-alert', 'Your turn!')
             }
 
         });
