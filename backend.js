@@ -24,7 +24,8 @@ const http = require('http')
 const server = http.createServer(app) //creates http server wrapped around express server
 
 //Socket.io server
-const { Server } = require('socket.io')
+const { Server } = require('socket.io');
+const { start } = require('repl');
 const io = new Server(server, { 
     pingInterval:2000,
     pingTimeout:20000
@@ -217,7 +218,24 @@ io.on('connection', (socket) => {
             } else {
                 console.log(`${backEndPlayers[socket.id].name} has declined to purchase ${space.name}.`);
                 console.log("Starting auction...");
-                space.startAuction();
+                startAuction(space);
+            }
+        });
+
+        socket.on('auction-bid', (spaceName, bid) => {
+            //get the actual object
+            space = board.getSpaceByName(spaceName);
+            //if the bid is greater than the current bid
+            if(bid > space.currentBid) {
+                //set the current bid to the new bid
+                space.currentBid = bid;
+                //set the current bidder to this socket
+                space.currentBidder = backEndPlayers[socket.id];
+                //log the info
+                console.log(`${backEndPlayers[socket.id].name} has bid ${bid} on ${space.name}!`);
+            } else {
+                console.log(`${backEndPlayers[socket.id].name} has bid ${bid} on ${space.name}.`);
+                console.log("That bid is too low!");
             }
         });
 
@@ -273,3 +291,7 @@ server.listen(port, () => {
 /* BEGIN MONOPOLY GAMEFLOW */
 // board object with all board spaces and a ton of data
 const board = new Board(io);
+
+function startAuction(space) {
+    
+}

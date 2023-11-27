@@ -24,9 +24,5 @@ class railroad {
         }
         return;
     }
-    startAuction() {
-        //placeholder
-    }
-
 }
 module.exports = railroad;

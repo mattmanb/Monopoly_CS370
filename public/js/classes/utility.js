@@ -29,9 +29,5 @@ class utility {
         player.addMoney(-1*amountOwed);
         return;
     }
-    startAuction() {
-        //placeholder
-    }
-
 }
 module.exports = utility;
