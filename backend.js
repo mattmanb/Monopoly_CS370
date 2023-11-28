@@ -27,7 +27,7 @@ const server = http.createServer(app) //creates http server wrapped around expre
 const { Server } = require('socket.io')
 const io = new Server(server, { 
     pingInterval:2000,
-    pingTimeout:5000
+    pingTimeout:20000
 }); //socket.io server wrapped around http server wrapped around express server (say that 10 times fast)
 /*   End Server setup   */
 
@@ -48,14 +48,17 @@ var backEndPieces = ["Thimble", "Shoe", "Top Hat",
 
 var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
 
+var inLobby = true;
+
 // Vars for checking who's turn it is
-var turnOrder = {};
-var currentPlayerTurn = 1;
+var turnOrder = [];
+var numDoubles = 0;
+var currentPlayerTurn = 0;
 var diceRolled = false ;
 
 io.on('connection', (socket) => {
     console.log('a user connected');
-    if(availablePlayers.length > 0) {
+    if(availablePlayers.length > 0 && inLobby) {
         //emit the pieces to the front end
         socket.emit('pieces-list', backEndPieces);
         //initialize a player's data
@@ -129,6 +132,9 @@ io.on('connection', (socket) => {
                     io.emit('update-content', data);
                 }
             })
+            if(page === "board") {
+                inLobby = false;
+            }
         });
 
         socket.on('send-message', (senderID, msg) => {
@@ -141,57 +147,99 @@ io.on('connection', (socket) => {
         });
 
         socket.on('start-game', () => {
+            inLobby = false;
             i = 0 ;
             // Set turn order (still need to randomize it, for now it is default order 1-8)
             for (const[key, value] of Object.entries(backEndPlayers)) {
-                turnOrder[i] = value.playerNumber ;
-                i++
+                turnOrder[i] = key;
+                i++;
             }
+
+            // Randomize turn order
+            for (var a = turnOrder.length - 1; a > 0; a--) {
+                var b = Math.floor(Math.random() * (a + 1));
+                var temp = turnOrder[a];
+                turnOrder[a] = turnOrder[b];
+                turnOrder[b] = temp;
+            }
+
             // Send alert to whoevers turn it is
-            io.to(Object.keys(backEndPlayers)[currentPlayerTurn]).emit('player-alert', 'Your turn!')
+            //Object.keys(backEndPlayers)[currentPlayerTurn]
+            io.to(turnOrder[currentPlayerTurn]).emit('player-alert', 'Your turn!')
             console.log(turnOrder);
         });
 
         socket.on('roll-dice', () => {
             // Check if it is this players turn
-            if(backEndPlayers[socket.id].playerNumber == turnOrder[currentPlayerTurn]) {
+            if(socket.id == turnOrder[currentPlayerTurn]) {
                 // Check if player already rolled this turn
                 if(!diceRolled) {
-                    console.log("It is this players turn")
+                    console.log("It is this players turn");
                     // Rolls dice and stores info in array (bool rolledDoubles, int numDoubles, int diceTotal, int currentPosition)
-                    rollInfo = backEndPlayers[socket.id].rollAndMove(0, board) ;
-                    // While doubles are being rolled
-                    while (rollInfo[0]) {
-                        if (rollInfo[1] < 3) {
-                            socket.emit('player-alert', `You rolled ${rollInfo[2]}. Doubles, roll again! Your position is ${rollInfo[3]}.`)
-                            rollInfo = backEndPlayers[socket.id].rollAndMove(rollInfo[1], board) ;
-                        }
-                        else {
-                            socket.emit('player-alert', '3 doubles! Go to jail!')
-                            break
-                        }
+                    rollInfo = backEndPlayers[socket.id].rollAndMove(0, board, socket);
+                    space = board.spaces[rollInfo[3]];
+
+                    // Checking if doubles were rolled
+
+                    numDoubles = rollInfo[1];
+
+                    if (!rollInfo[0]) {
+                        socket.emit('player-alert', `You rolled ${rollInfo[2]}. Your position is ${rollInfo[3]}.`);
+                        diceRolled = true;
                     }
-                    socket.emit('player-alert', `You rolled ${rollInfo[2]}. Your position is ${rollInfo[3]}.`)
-                    diceRolled = true ;
-                }
+                    else if (numDoubles < 3) {
+                        socket.emit('player-alert', `You rolled ${rollInfo[2]}. Doubles, roll again! Your position is ${rollInfo[3]}.`);
+                    }
+                    else {
+                        socket.emit('player-alert', '3 doubles! Go to jail!');
+                        diceRolled = true;
+                    }
+
+                    if (space instanceof Property || space instanceof Railroad || space instanceof Utility) {
+                        console.log("Space is a purchaseable");
+                        socket.emit('land-purchase', space.name, space.price);
+                    } 
+                } 
+                // If player already rolled this turn
                 else {
                     socket.emit('player-alert', "You have finished rolling this turn.")
                 }
-            }
+            } 
+            // If it is not this players turn
             else {
                 socket.emit('player-alert', "It is not your turn yet!")
+            }
+        });
+
+        socket.on('purchase-decision', (spaceName, response) => {
+            //get the actual object
+            space = board.getSpaceByName(spaceName);
+            console.log("Fetched space from the name", space);
+            //if the response to buying this property/railroad/utility is YES (true)
+            if(response) {
+                //set the space's owner to this socket
+                space.owner = backEndPlayers[socket.id];
+                //subtract the price from the players inventory
+                backEndPlayers[socket.id].addMoney(space.price * -1);
+                //log the info
+                console.log(`${backEndPlayers[socket.id].name} has purchased ${space.name}!`);
+                console.log(`The owner of ${space.name} is ${space.owner.name}.`);
+            } else {
+                console.log(`${backEndPlayers[socket.id].name} has declined to purchase ${space.name}.`);
+                console.log("Starting auction...");
+                space.startAuction();
             }
         });
 
         socket.on('end-turn', () => {
             var turnChanged = false;
             // Check if it is this players turn
-            if(backEndPlayers[socket.id].playerNumber == turnOrder[currentPlayerTurn]) {
+            if(socket.id == turnOrder[currentPlayerTurn]) {
                 // Check if they have rolled yet
                 if(diceRolled) {
                     // Ends turn and sets turn to whoever is next in line
                     socket.emit('player-alert', "Your turn is now over.")
-                    if (currentPlayerTurn >= Object.keys(turnOrder).length - 1) {
+                    if (currentPlayerTurn >= turnOrder.length - 1) {
                         currentPlayerTurn = 0;
                     }
                     else {
@@ -210,7 +258,7 @@ io.on('connection', (socket) => {
 
             // Send alert to whoever's turn it is right now if turn changed
             if(turnChanged) {
-                io.to(Object.keys(backEndPlayers)[currentPlayerTurn]).emit('player-alert', 'Your turn!')
+                io.to(turnOrder[currentPlayerTurn]).emit('player-alert', 'Your turn!')
             }
 
         });
@@ -234,4 +282,4 @@ server.listen(port, () => {
 
 /* BEGIN MONOPOLY GAMEFLOW */
 // board object with all board spaces and a ton of data
-const board = new Board();
+const board = new Board(io);

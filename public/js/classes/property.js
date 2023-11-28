@@ -12,6 +12,7 @@ class property{ //color to be implemented in street.js
         this.mortgage = mortgage;
         this.owner = null;
         this.avenue = avenue; //what avenue this property is a part of
+        this.type = "property";
     }
     isOwned() {
         if(this.owner !== null) {
@@ -30,17 +31,12 @@ class property{ //color to be implemented in street.js
             }
         } 
     }
-    queryPurchase(player) {
-        if(player.money >= this.price) {
-            
-        }
-    }
     isMonopoly() {
         // uses isMonopoly method from the avenue class this property is apart of
         return this.avenue.isMonopoly();
     }
     startAuction() {
-        // empty function for now
+        //placeholder
     }
 }
 module.exports = property;

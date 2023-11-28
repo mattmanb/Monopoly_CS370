@@ -48,9 +48,8 @@ socket.on('updateLobby', (backEndPlayers) => {
             }       }
         for(const id in frontEndPlayers) { //Ensure no players exist on the front end that don't on the backend
             if(!backEndPlayers[id]) {
-                const player_box = document.getElementById((frontEndPlayers[id].playerNumber).toString())
                 if(inLobby) {
-                    player_box.style.backgroundColor = "#3498db";
+                    $(`${frontEndPlayers[id].playerNumber}`).css("background-color", "#3498db");
                 }
                 delete frontEndPlayers[id];
             }
@@ -94,7 +93,6 @@ socket.on('update-content', (content) => {
 
 $('#app').on('click', '#startGameButton', () => {
     startGame();
-    inLobby = false;
 });
 
 $('#app').on('click', '#back_to_home', () => {
@@ -126,6 +124,7 @@ function startGame() {
     } else {
         socket.emit('load-page', ("board"));
         socket.emit('start-game');
+        inLobby = false;
     }
 }
 
@@ -299,4 +298,21 @@ socket.on('msg-incoming', (msg) => {
 
     //Scroll to the bottom to show the latest messages
     messageContainer.scrollTop(messageContainer[0].scrollHeight);
+});
+
+/*** Socketio for the game itself ***/
+
+socket.on('get-board-data', (BE_board) => {
+    FE_board = BE_board;
+})
+
+socket.on('land-purchase', (propertyName, propertyPrice) => {
+    console.log(`Would you like to purchase ${propertyName} for ${propertyPrice}?`);
+    const msg = `Would you like to purchase ${propertyName} for ${propertyPrice}?`;
+    const response = confirm(msg);
+    socket.emit('purchase-decision', propertyName, response);
+});
+
+socket.on('start-auction', (property) => {
+    alert(`Auction for ${property.name} has started!`);
 });
