@@ -516,6 +516,30 @@ h6 {
 
 .parent{
   display: grid;
-  grid-gap: 1px;
-  
+  grid-template-columns: repeat(4, 30px);
+  grid-template-rows: repeat(2, 20px);
+  position:absolute;
+}
+
+.parent > div { 
+  padding-top: 40px;
+  border-radius: 10px;
+  border-color: black;
+  display:grid;
+  place-content: center;
+}
+
+.parent-small{
+  display: grid;
+  grid-template-columns: repeat(4, 20px);
+  grid-template-rows: repeat(2, 20px);
+  position:absolute;
+}
+.parent-small > div{
+
+  padding-top: 30px;
+  border-radius: 10px;
+  border-color: black;
+  display:grid;
+  place-content: center;
 }
