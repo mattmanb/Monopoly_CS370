@@ -46,7 +46,6 @@ export class Card {
             }
         }
 
-
         //player passes Go and not directly to jail
         if (pos < player.currentPosition && pos != 40) {
             player.money += 200;
@@ -85,14 +84,6 @@ export class Card {
         player.outOfJailCards++;
     }
     
-    backThree(player) {
-        //move player three spaces back
-    }
-    
-    eatAtCC(player) {
-        //go to cc jail
-    }
-    
     generalRepair(player) {
         //get classrooms
         //pay 25 each
@@ -103,40 +94,9 @@ export class Card {
     classPresident(player) {
         //give each other player 50
     }
-    paidInternship(player) {
-        //collect 150
-    }
-    
-    midtermsRetailVenmoSidewalk(player) {
-        //collect 100
-    }
-
-    bursarError(player) {
-        //collect 200
-    }
-
-    parkingFee(player) {
-        //pay 50
-    }
 
     movieNight(player) {
         //get 50 from each player
-    }
-
-    loansRefund(player) {
-        //collect 20
-    }
-
-    birthdayVending(player) {
-        //get 10
-    }
-
-    partyDamamge(player) {
-        //pay 100
-    }
-
-    tutor(player) {
-        //get 25
     }
 
     streetRepair(player) {

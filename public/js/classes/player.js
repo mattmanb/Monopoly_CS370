@@ -9,6 +9,7 @@ class player {
         this.outOfJailCards = outOfJailCards;
         this.turnsInJail = turnsInJail;
         this.playerNumber = playerNumber;
+        //Can we add number of active houses and hotels?
     }
 
     addMoney(money) {
