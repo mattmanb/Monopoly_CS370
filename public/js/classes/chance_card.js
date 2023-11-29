@@ -1,6 +1,19 @@
 // chance card class
-export class chance_card {
-
+class chance_card {
+    //The parameters have default values; aka parameters pass in on spaces 4 and 38
+    constructor(special_condition = false, player = null, price = null) {
+        this.special_condition = special_condition;
+        this.player = player;
+        this.price = price;
+    }
+    executeSpecialCondition(player) {
+        if(this.price === 200) {
+            player.addMoney(Math.max(-200, player.money*-.2))
+        } else {
+            player.addMoney(this.price); //add or subtract based on the price
+        }
+        return;
+    }
     //This function gives the player a card from the chance deck
     giveChanceCard(player, chanceGameDeck) {
         const chanceDeck = [
@@ -35,6 +48,10 @@ export class chance_card {
 
         return cardDelt;
     }
+    pullChanceCard(player) {
+        // empty function for now
+    }
     
 }
 
+module.exports = chance_card;
