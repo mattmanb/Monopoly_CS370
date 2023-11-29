@@ -1,18 +1,21 @@
 const Property = require('./property.js');
-const Chance_Card = require('./chance_card.js');
-const Community_Chest_Card = require('./community_chest_card.js');
+const Chance_Deck = require('./chance_deck.js');
+const Community_Deck = require('./community_deck.js');
 const Railroad = require('./railroad.js');
 const Utility = require('./utility.js');
 const Avenue = require('./avenue.js')
+const Special_Event = require('./special_event.js');
+const Card = require('./card.js');
 
 class board {
     constructor(io) {
         this.io = io;
-
+        this.Chance_Card_Deck = new Chance_Deck();
+        this.Community_Card_Deck = new Community_Deck();
         this.spaces = [];
         this.avenues = [];
 
-        this.spaces[0] = new Chance_Card(true, 200);
+        this.spaces[0] = new Special_Event({name:"Go", amount:200});
 
         // Creating avenue objects so we can check for a monopoly easier
         this.avenues[0] = new Avenue({ name:"Cafeteria Corner", color:"dark-purple", spaces:[1, 3] });
@@ -27,7 +30,7 @@ class board {
             io: this.io });
         this.avenues[0].addProperty(this.spaces[1]); // Add "Commuter Student Lounge" to "Cafeteria Corner"
 
-        this.spaces[2] = new Community_Chest_Card(); //Community Chest Card constructor should handle this
+        this.spaces[2] = this.Community_Card_Deck; //Community Chest Card constructor should handle this
 
         this.spaces[3] = new Property({
             name:"Glowing Staircase", 
@@ -39,7 +42,7 @@ class board {
             io: this.io});
         this.avenues[0].addProperty(this.spaces[3]);
 
-        this.spaces[4] = new Chance_Card({special_condition:true, price:-200}); //sends the value in that makes the player pay less (-200 or -20% of players money)
+        this.spaces[4] = new Special_Event({name:"Student Loans Due", price:-200}); //Special Event constructor should handle this
         /*
         Explanation: Instead of having a creating a whole class or function for the student loans spot, 
         lets just make it a method in Chance_Card that lets the user choose 10% or $200 (probably should
@@ -69,7 +72,7 @@ class board {
             io: this.io });
         this.avenues[1].addProperty(this.spaces[6]);
 
-        this.spaces[7] = new Chance_Card();
+        this.spaces[7] = this.Chance_Card_Deck; //landOn method should handle this - just denoting this is a chance card space
 
         this.spaces[8] = new Property({
             name:"Wildcat Den", 
@@ -148,7 +151,7 @@ class board {
             io: this.io });
         this.avenues[3].addProperty(this.spaces[16]);
 
-        this.spaces[17] = new Community_Chest_Card();
+        this.spaces[17] = this.Community_Card_Deck;
 
         this.spaces[18] = new Property({
             name:"Wildcat Grill", 
@@ -184,7 +187,7 @@ class board {
             io: this.io });
         this.avenues[4].addProperty(this.spaces[21]);
 
-        this.spaces[22] = new Chance_Card();
+        this.spaces[22] = this.Chance_Card_Deck;
 
         this.spaces[23] = new Property({
             name:"Mail Room", 
@@ -250,7 +253,7 @@ class board {
             io: this.io });
         this.avenues[5].addProperty(this.spaces[29]);
 
-        this.spaces[30] = new Community_Chest_Card({special_condition:true, position:40}); //send the player immediately to jail when they land here
+        this.spaces[30] = new Special_Event({name:"Go to Jail!", price: 0, position: 40}); //send the player immediately to jail when they land here
 
         this.avenues[6] = new Avenue({ name:"Library Lane", color:"green", spaces:[31, 32, 34] });
 
@@ -274,7 +277,7 @@ class board {
             io: this.io });
         this.avenues[6].addProperty(this.spaces[32]);
 
-        this.spaces[33] = new Community_Chest_Card();
+        this.spaces[33] = this.Chance_Card_Deck;
 
         this.spaces[34] = new Property({
             name:"Cayan Library", 
@@ -292,7 +295,7 @@ class board {
             mortgage:100, 
             io: this.io });
     
-        this.spaces[36] = new Chance_Card();
+        this.spaces[36] = this.Chance_Card_Deck;
 
         this.avenues[7] = new Avenue({ name:"Innovation Plaza", color:"dark-blue", spaces:[37, 39] });
 
@@ -306,7 +309,7 @@ class board {
             io: this.io });
         this.avenues[7].addProperty(this.spaces[37]);
 
-        this.spaces[38] = new Chance_Card(true, this.player, -75);
+        this.spaces[38] = new Special_Event({name:"Restock Wildcat Dollars", price:-75});
 
         this.spaces[39] = new Property({
             name:"Wildcat Statue", 
@@ -330,20 +333,14 @@ class board {
             }
     
         }
-        else if(space instanceof Chance_Card) {
-            if(space.special_condition) {
-                space.executeSpecialCondition(player)
-            } else {
-                space.pullChanceCard(player); //implement pullChanceCard method for chancecard (Maybe do a chance deck class to instantiate the deck and shuffle)
-            }
+        else if(space instanceof Special_Event) { //IMPLEMENT THIS
+            return;
         }
-        else if(space instanceof Community_Chest_Card) {
-            if(space.special_condition) {
-                space.executeSpecialCondition(player);
-            } else {
-                space.pullCommunityChestCard(player); 
-                //implement pullCommunityChestCard method for com chest (Maybe do a community chest deck class to instantiate the deck and shuffle)
-            }
+        else if(space instanceof Chance_Deck) { //IMPLEMENT THIS
+            return;
+        }
+        else if(space instanceof Community_Deck) { //IMPLEMENT THIS
+            return;
         }
         else if(space instanceof Railroad) {
             if(space.isOwned()) { //If the railroad is owned, make the play who landed here pay
@@ -360,8 +357,7 @@ class board {
             }
         }
         else {
-            // Commenting this out for now, sendToJail is called on just visiting space as well
-            // space.sendToJail(player); //send this player to jail
+            // the only other case is nothing happens, in which a message will be displayed... thats it
         }
     }
     isMonopoly(space_ind) {
@@ -374,12 +370,14 @@ class board {
         //Need to find what avenue we're checking
         const resultAvenue = this.avenues.find(avenue => avenue.spaces.includes(space_ind));
 
+        //Check to see if the avenue is a monopoly by a player
         if(resultAvenue.isMonopoly()) {
             return true;
         } else {
             return false;
         }
     }
+    //this function is for when the front end sends back information reguarding the purchse of a property
     getSpaceByName(spaceName) {
         return this.spaces.find(space => space.name === spaceName);
     }

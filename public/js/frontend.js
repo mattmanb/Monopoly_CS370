@@ -301,6 +301,8 @@ socket.on('get-board-data', (BE_board) => {
     FE_board = BE_board;
 })
 
+// ########################### Property/Railroad/Utility Handling ########################### //
+
 socket.on('land-purchase', (propertyName, propertyPrice) => {
     console.log(`Would you like to purchase ${propertyName} for ${propertyPrice}?`);
     // const msg = `Would you like to purchase ${propertyName} for ${propertyPrice}?`;
@@ -317,9 +319,6 @@ socket.on('land-purchase', (propertyName, propertyPrice) => {
         $('#modal').hide();
     });
 });
-
-// ########################### Modals (Pop-ups) ########################### //
-
 function createPurchaseModal(spaceName, propertyPrice) {
     const modalContent = $('<div>').addClass('modal-content');
     const message = $('<p>').text(`Would you like to purchase ${spaceName} for ${propertyPrice}?`);
@@ -330,26 +329,65 @@ function createPurchaseModal(spaceName, propertyPrice) {
 
     return modalContent;
 }
+// ########################### Auction Handling ########################### //
 
 socket.on('auction-started', (spaceName, spacePrice) => {
     alert(`Auction for ${spaceName} has started!\nStarting bid is ${spacePrice}`);
+    console.log(`Auction for ${spaceName} has started!\nStarting bid is ${spacePrice}`);
 });
 
 socket.on('your-bid', (auction_info) => {
-    const bid = prompt(`Enter a bid higher than ${auction_info.currentBid} or 0 to pass.`);
-    if (bid < auction_info.currentBid) {
+    const modalContent = createAuctionModal(auction_info.propertyName, auction_info.currentBid, auction_info.currentBidderName);
+    $('#modal').append(modalContent);
+    $('#modal').css('visibility', 'visible');
+    $('#passButton').on('click', () => {
+        console.log('passing');
         socket.emit('bid-pass', auction_info);
-    } else {
-        auction_info.currentBid = bid;
-        socket.emit('bid', auction_info);
-    }
-    
+        $('#modal').hide();
+    });
+    $('#submitBid').on('click', () => {
+        const bid = parseInt($('#bidBox').val());
+        if (bid < auction_info.currentBid) {
+            console.log('passing, bid too low');
+            socket.emit('bid-pass', auction_info);
+        } else if(bid === NaN) {
+            console.log('passing, entered nothing');
+            socket.emit('bid-pass', auction_info);
+        } else {
+            console.log('submitting bid');
+            socket.emit('bid', auction_info, bid);
+        }
+        $('#modal').hide();
+    });
 });
+
+function createAuctionModal(spaceName, currentBid, currentBidder) {
+    const modalContent = $('<div>').addClass('modal-content');
+    let message;
+    if(!currentBidder) {
+        message = $('<p>').text(`Would you like to bid on ${spaceName}?\nStarting bid is ${currentBid}.`);
+    } else {
+        message = $('<p>').text(`Would you like to bid on ${spaceName}?\nCurrent bid is ${currentBid} by ${currentBidder}.`);
+    }
+    const bidBox = $('<input>').attr({
+        'id': 'bidBox',
+        'type': 'number',
+        'placeholder': 'Enter bid here'
+    });
+    const submitBid = $('<button>').text('Bid').attr('id', 'submitBid');
+    const passButton = $('<button>').text('Pass').attr('id', 'passButton');
+
+    modalContent.append(message, bidBox, submitBid, passButton);
+
+    return modalContent;
+}
 
 socket.on('auction-ended', (auction_info) => {
     if(auction_info.currentBidderID === null) {
+        console.log(`No one bid on ${auction_info.propertyName}.\n Game continues...`)
         alert(`No one bid on ${auction_info.propertyName}.\n Game continues...`);
     } else {
+        console.log(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`);
         alert(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`);
     }
 });

@@ -5,8 +5,8 @@
 //this syntax works instead
 const Player = require('./public/js/classes/player.js');
 const Property = require('./public/js/classes/property.js');
-const Chance_Card = require('./public/js/classes/chance_card.js');
-const Community_Chest_Card = require('./public/js/classes/community_chest_card.js');
+const Chance_Deck = require('./public/js/classes/chance_deck.js');
+const Community_Deck = require('./public/js/classes/community_deck.js');
 const Railroad = require('./public/js/classes/railroad.js');
 const Utility = require('./public/js/classes/utility.js');
 const Avenue = require('./public/js/classes/avenue.js')
@@ -265,9 +265,10 @@ io.on('connection', (socket) => {
         // ########################### Auction Stuff ########################### //
 
         socket.on('bid', (auction_info) => {
+            console.log(`${backEndPlayers[socket.id].name} has bid $${auction_info.currentBid} on ${auction_info.spaceForAuction}.`)
             //set the current bidder as the one who just bid
-            auction_info.currentBidderName = backEndPlayers[auction_info.bidOrder[auction_info.bidOrderInd]].name;
-            auction_info.currentBidderID = auction_info.bidOrder[auction_info.bidOrderInd];
+            auction_info.currentBidderName = backEndPlayers[socket.id].name;
+            auction_info.currentBidderID = socket.id;
             //reset number of passes
             auction_info.numPasses = 0;
             //go to the next player in the order
@@ -276,23 +277,27 @@ io.on('connection', (socket) => {
                 auction_info.bidOrderInd = 0;
             }
             //query the user for their bid or pass
-            io.emit.to(auction_info.bidOrder[auction_info.bidOrderInd]).emit('your-bid', auction_info);
+            console.log("Sending bid request to", backendPlayers[auction_info.bidOrder[auction_info.bidOrderInd]].name)
+            io.to(auction_info.bidOrder[auction_info.bidOrderInd]).emit('your-bid', auction_info);
         });
 
         socket.on('bid-pass', (auction_info) => {
+            console.log(`${backEndPlayers[socket.id].name} has passed on ${auction_info.spaceForAuction}.`)
             // Increment the number of passes
             auction_info.numPasses += 1;
             // Check if everyone has passed
             if (auction_info.numPasses >= auction_info.bidOrder.length - 1 && auction_info.currentBidderID !== null) {
+                console.log("Auction ended! Everyone passed after someone bid.")
                 // End the auction
                 io.emit('auction-ended', auction_info);
                 setOwner(auction_info.spaceForAuction, auction_info.currentBidderID);
-            } else if(auction_info.numPasses == auction_info.bidOrder.length && auction_info.currentBidderID == null) {
+            } else if(auction_info.numPasses === auction_info.bidOrder.length && auction_info.currentBidderID === null) {
                 // If everyone passes and no one has bid yet, the auction is over
+                console.log("Auction ended! Everyone passed before someone bid.")
                 io.emit('auction-ended', auction_info);
             }
-            //edge case where everyone passes the bids (the last player won't be able to bid!)
             else {
+                console.log("Sending bid request to", backendPlayers[auction_info.bidOrder[auction_info.bidOrderInd]].name)
                 // Set the next bidder
                 auction_info.bidOrderInd += 1;
                 if (auction_info.bidOrderInd >= auction_info.bidOrder.length) {
@@ -325,8 +330,10 @@ server.listen(port, () => {
 const board = new Board(io);
 var currentBid = 0;
 
+//THIS FUNCTION IS WRONGGGGGGGGGGGGGGGGGGGGGGGG (bidOrder and bidOrderInd need to be changed)
 function startAuction(space) {
     // Start the auction
+    console.log("Starting auction...");
     io.emit('auction-started', space.name, space.price);
     // Set the bid order (everyone except the person who started the auction)
     turnOrderCopy = [...turnOrder];
@@ -343,6 +350,8 @@ function startAuction(space) {
         numPasses: 0, 
         auctionStarterID: turnOrder[currentPlayerTurn]
     };
+    console.log("Auction info", auction_info)
+    // Send the first bid request to the first bidder
     io.to(auction_info.bidOrder[auction_info.bidOrderInd]).emit('your-bid', auction_info);
 }
 
