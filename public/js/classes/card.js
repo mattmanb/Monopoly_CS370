@@ -10,32 +10,54 @@ export class Card {
         if(typeof this.action === 'function') {
             this.action(player)
         }
-        console.log(`Get a paid internship—Collect $${money}`);
-
+        //console.log(`Get a paid internship—Collect $${money}`);
     }
 
     teleport(player, pos) {
-        passedGo(player);
-        player.setPosition(pos);
+        //Player must go to nearest bridge (utility)
+        if(pos == -1) {
+            if (player.currentPosition < 12 || player.currentPosition >= 28) {
+                pos = 12;
+            }
+            else {
+                pos = 28;
+            }
+            //if bridge unowned, creawte opportunity to buy utility
+
+            //if bridge is owned, pay ten times amount rolled on dice
+            num1 = rollDice();
+            num2 = rollDice();
+            tot = addDice(num1, num2);
+        }
+
+        //Player must go to nearest dorm (RR)
+        else if ( pos == -2) {
+            if (player.currentPosition < 5 || player.currentPosition >= 35) {
+                pos = 5;
+            }
+            else if(player.currentPosition >= 5 && player.currentPosition < 15) {
+                pos = 15;
+            }
+            else if(player.currentPosition >= 15 && player.currentPosition < 25) {
+                pos = 25;
+            }
+            else {
+                pos = 35;
+            }
+        }
+
+
+        //player passes Go and not directly to jail
+        if (pos < player.currentPosition && pos != 40) {
+            player.money += 200;
+        }
+        //set player position
+        player.currentPosition = pos;
+        socket.emit('update-player', player) // emits new pos to the backend
     }
 
     money(player,x) {
-        player.addMoney(x);
-    }
-
-    advanceGo(player) {
-        //move player icon to go
-        player.setPosition(0);
-    }
-    
-    advanceLC(player) {
-        //move player icon to Learning center
-        //if pass go get 200
-    }
-    
-    advancePP(player) {
-        //move player to poly pizza
-        //if pass go get 200
+        player.money += x;
     }
     
     advanceBridge(player) {
@@ -76,20 +98,6 @@ export class Card {
         //pay 25 each
         //get lecture halls
         //pay 100 each
-    }
-    
-    mealOffCampus(player) {
-        //pay 15
-    }
-    
-    advanceOriskany(player) {
-        //move player to Oriskany
-        //if pass go collect 200
-    
-    }
-    
-    advanceStatue(player) {
-        //move player to statue
     }
     
     classPresident(player) {

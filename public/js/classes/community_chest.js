@@ -27,21 +27,21 @@ export class community_chest {
         this.cards.push(
             new card(comChestDeck[0], () => teleport(player, 0)),
             new card(comChestDeck[1], () => money(player, 200)),
-            new card(comChestDeck[2]),
-            new card(comChestDeck[3]),
+            new card(comChestDeck[2], () => money(player, -150)),
+            new card(comChestDeck[3], () => money(player, 50)),
             new card(comChestDeck[4]),
-            new card(comChestDeck[5]),
+            new card(comChestDeck[5], () => teleport(player, 40)),
             new card(comChestDeck[6]),
-            new card(comChestDeck[7]),
-            new card(comChestDeck[8]),
-            new card(comChestDeck[9]),
-            new card(comChestDeck[10]),
-            new card(comChestDeck[11]),
-            new card(comChestDeck[12]),
-            new card(comChestDeck[13]),
+            new card(comChestDeck[7], () => money(player, 100)),
+            new card(comChestDeck[8], () => money(player, 20)),
+            new card(comChestDeck[9], () => money(player, 10)),
+            new card(comChestDeck[10], () => money(player, 100)),
+            new card(comChestDeck[11], () => money(player, -100)),
+            new card(comChestDeck[12], () => money(player, -150)),
+            new card(comChestDeck[13], () => money(player, 25)),
             new card(comChestDeck[14]),
-            new card(comChestDeck[15]),
-            new card(comChestDeck[16])
+            new card(comChestDeck[15], () => money(player, 10)),
+            new card(comChestDeck[16], () => money(player, 100))
         );
     }
 
