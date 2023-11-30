@@ -30,18 +30,18 @@ export class chance_deck {
             new card(chanceDeck[2], () => teleport(player, 21)),
             new card(chanceDeck[3], () => teleport(player, -1)),
             new card(chanceDeck[4], () => teleport(player, -2)),
-            new card(chanceDeck[5],),
-            new card(chanceDeck[6],),
+            new card(chanceDeck[5], () => money(player, 50)),
+            new card(chanceDeck[6], () => outOfCC(player)),
             new card(chanceDeck[7], () => teleport(player, player.currentPosition - 3)),
             new card(chanceDeck[8], () => teleport(player, 40)),
-            new card(chanceDeck[9],),
+            new card(chanceDeck[9], () => repair(player, 0)),
             new card(chanceDeck[10], () => money(player, -15)),
             new card(chanceDeck[11], () => teleport(player, 5)),
             new card(chanceDeck[12], () => teleport(player, 39)),
-            new card(chanceDeck[13],),
+            new card(chanceDeck[13], () => moneyEveryone(player, -50)),
             new card(chanceDeck[14], () => money(player, 150)),
             new card(chanceDeck[15], () => money(player, 100)),
-            new card(chanceDeck[16],)
+            new card(chanceDeck[16], () => moneyEveryone(player, 50))
         );
     }
 
