@@ -46,6 +46,7 @@ export class community_chest {
     }
 
     shuffle() {
+        //Fisher-Yates
 
     }
 
