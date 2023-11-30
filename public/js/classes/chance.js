@@ -46,6 +46,7 @@ export class chance_deck {
     }
 
     shuffle() {
+        //Fisher-Yates shuffle?
 
     }
 
@@ -62,6 +63,10 @@ export class chance_deck {
 
         return cardDelt;
 
+    }
+
+    resetDeck() {
+        
     }
 }
 
