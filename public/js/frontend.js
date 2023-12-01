@@ -66,7 +66,7 @@ socket.on('update-pieces', (backEndPlayers) => {
         if(pieceMapLocation.find("img").length === 0) {
             const piece = $(`<img>`); //create a new image element
             piece.attr({
-                "z-index": "100",
+                "z-index": "10",
                 "src": `../img/${backEndPlayers[id].piece}.png`,
                 "alt": `${backEndPlayers[id].piece} piece`,
                 "width": "20px",
