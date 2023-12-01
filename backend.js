@@ -51,6 +51,8 @@ var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
 
 var inLobby = true;
 
+const messages = {"info": "blue", "warning": "#FEBE10", "error": "red", "success": "#32de84"};
+
 // Vars for checking who's turn it is
 var turnOrder = [];
 var numDoubles = 0;
@@ -104,7 +106,7 @@ io.on('connection', (socket) => {
                 backEndPlayers[socket.id].piece = userData.selectedPiece;
                 const pieceInd = backEndPieces.indexOf(backEndPlayers[socket.id].piece);
                 backEndPieces.splice(pieceInd, 1);
-                socket.emit('player-alert', `Name and piece updated!\nName: ${backEndPlayers[socket.id].name}\nPiece: ${backEndPlayers[socket.id].piece}`);
+                socket.emit('game-event', `Name and piece updated!\nName: ${backEndPlayers[socket.id].name}\nPiece: ${backEndPlayers[socket.id].piece}`, messages["success"]);
             }
         });
 
@@ -142,14 +144,11 @@ io.on('connection', (socket) => {
             }
         });
 
-        socket.on('game-message', (msg) => {
-            io.emit('game-msg-incoming', msg);
-        });
-
         // ########################### Gameflow (Turns, rolling dice, etc.) ########################### //
 
         socket.on('start-game', () => {
             io.emit('update-pieces', backEndPlayers);
+            io.emit('game-event', 'Game started!', messages["success"]);
             inLobby = false;
             i = 0 ;
             // Set turn order (still need to randomize it, for now it is default order 1-8)
@@ -168,7 +167,7 @@ io.on('connection', (socket) => {
 
             // Send alert to whoevers turn it is
             //Object.keys(backEndPlayers)[currentPlayerTurn]
-            io.to(turnOrder[currentPlayerTurn]).emit('player-alert', 'Your turn!')
+            io.emit('game-event', `${backEndPlayers[turnOrder[currentPlayerTurn]].name}'s turn!`, messages["info"]);
             console.log(turnOrder);
         });
 
@@ -183,6 +182,7 @@ io.on('connection', (socket) => {
                     // Rolls dice and stores info in array (bool rolledDoubles, int numDoubles, int diceTotal, int currentPosition)
                     rollInfo = backEndPlayers[socket.id].rollAndMove(0, board, socket);
                     io.emit('update-pieces', backEndPlayers);
+                    io.emit('game-event', (backEndPlayers[socket.id].name + " rolled " + rollInfo[2] + " and landed on " + board.spaces[rollInfo[3]].name + "."), messages["info"]);
                     space = board.spaces[rollInfo[3]];
 
                     // Checking if doubles were rolled
@@ -190,14 +190,14 @@ io.on('connection', (socket) => {
                     numDoubles = rollInfo[1];
 
                     if (!rollInfo[0]) {
-                        socket.emit('player-alert', `You rolled ${rollInfo[2]}. Your position is ${rollInfo[3]}.`);
+                        socket.emit('game-event', `You rolled ${rollInfo[2]}. Your position is ${rollInfo[3]}.`, messages["success"]);
                         diceRolled = true;
                     }
                     else if (numDoubles < 3) {
-                        socket.emit('player-alert', `You rolled ${rollInfo[2]}. Doubles, roll again! Your position is ${rollInfo[3]}.`);
+                        socket.emit('game-event', `You rolled ${rollInfo[2]}. Doubles, roll again! Your position is ${rollInfo[3]}.`, messages["success"]);
                     }
                     else {
-                        socket.emit('player-alert', '3 doubles! Go to jail!');
+                        socket.emit('game-event', '3 doubles! Go to jail!', messages["error"]);
                         diceRolled = true;
                     }
 
@@ -208,12 +208,12 @@ io.on('connection', (socket) => {
                 } 
                 // If player already rolled this turn
                 else {
-                    socket.emit('player-alert', "You have finished rolling this turn.")
+                    socket.emit('game-event', "You have finished rolling this turn.", messages["error"]);
                 }
             } 
             // If it is not this players turn
             else {
-                socket.emit('player-alert', "It is not your turn yet!")
+                socket.emit('game-event', "It is not your turn yet!", messages["error"]);
             }
         });
 
@@ -224,7 +224,7 @@ io.on('connection', (socket) => {
                 // Check if they have rolled yet
                 if(diceRolled) {
                     // Ends turn and sets turn to whoever is next in line
-                    socket.emit('player-alert', "Your turn is now over.")
+                    socket.emit('game-event', "Your turn is now over.", messages["success"]);
                     if (currentPlayerTurn >= turnOrder.length - 1) {
                         currentPlayerTurn = 0;
                     }
@@ -235,16 +235,16 @@ io.on('connection', (socket) => {
                     turnChanged = true;
                 }
                 else {
-                    socket.emit('player-alert', "You haven't rolled yet!")
+                    socket.emit('game-event', "You haven't rolled yet!", messages["error"]);
                 }
             }
             else {
-                socket.emit('player-alert', "It is not your turn yet!")
+                socket.emit('game-event', "It is not your turn yet!", messages["error"]);
             }
 
             // Send alert to whoever's turn it is right now if turn changed
             if(turnChanged) {
-                io.to(turnOrder[currentPlayerTurn]).emit('player-alert', 'Your turn!')
+                io.emit('game-event', `${backEndPlayers[turnOrder[currentPlayerTurn]].name}'s turn!`, messages["info"]);
             }
 
         });
@@ -262,10 +262,13 @@ io.on('connection', (socket) => {
                 //subtract the price from the players inventory
                 backEndPlayers[socket.id].addMoney(space.price * -1);
                 //log the info
+                io.emit('game-event', `${backEndPlayers[socket.id].name} has purchased ${space.name}!`, messages["info"]);
                 console.log(`${backEndPlayers[socket.id].name} has purchased ${space.name}!`);
                 console.log(`The owner of ${space.name} is ${space.owner.name}.`);
             } else {
+                io.emit('game-event', `${backEndPlayers[socket.id].name} has declined to purchase ${space.name}.`, messages["info"]);
                 console.log(`${backEndPlayers[socket.id].name} has declined to purchase ${space.name}.`);
+                io.emit('game-event', `${space.name} is now up for auction!`, messages["success"]);
                 console.log("Starting auction...");
                 startAuction(space);
             }
@@ -274,6 +277,7 @@ io.on('connection', (socket) => {
         // ########################### Auction Stuff ########################### //
 
         socket.on('bid', (auction_info) => {
+            io.emit('game-event', `${backEndPlayers[socket.id].name} has bid $${auction_info.currentBid} on ${auction_info.spaceForAuction}.`, messages["info"])
             console.log(`${backEndPlayers[socket.id].name} has bid $${auction_info.currentBid} on ${auction_info.spaceForAuction}.`)
             //set the current bidder as the one who just bid
             auction_info.currentBidderName = backEndPlayers[socket.id].name;
@@ -286,7 +290,7 @@ io.on('connection', (socket) => {
                 auction_info.bidOrderInd = 0;
             }
             //query the user for their bid or pass
-            console.log("Sending bid request to", backendPlayers[auction_info.bidOrder[auction_info.bidOrderInd]].name)
+            console.log("Sending bid request to", backendPlayers[auction_info.bidOrder[auction_info.bidOrderInd]].name);
             io.to(auction_info.bidOrder[auction_info.bidOrderInd]).emit('your-bid', auction_info);
         });
 
@@ -373,6 +377,3 @@ function setOwner(spaceName, ownerID) {
     return;
 }
 // ########################### Misc ########################### //
-function sendGameMsg(msg) {
-    io.emit('game-msg-incoming', msg);
-}

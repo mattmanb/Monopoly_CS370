@@ -9,7 +9,10 @@ var inLobby = true;
 const frontEndPlayers = {}; //dictionary of players who connect (socket.id is the key for each player)
 var frontEndPieces = [];
 
-/*** Start socket.io ***/
+//dictionary of colors for different kinds of messages
+const messages = {"info": "#3498db", "warning": "#FEBE10", "error": "#fd5c63", "success": "#32de84"};
+
+// ########################### Socket.io ########################### //
 socket.on('updateLobby', (backEndPlayers) => {
     if(inLobby) {
         socket.emit('fe-wants-pieces-updated'); //send the request to update fe pieces
@@ -89,7 +92,7 @@ socket.on('pieces-list', (backEndPieces) => {
 });
 
 socket.on('piece-taken', (piece) => {
-    alert(`The ${piece} piece is taken! Please try again.`)
+    gameEvent(`The ${piece} piece is taken! Please try again.`, "red");
 });
 
 socket.on('update-connected-players', (unconnected_players) => {
@@ -99,21 +102,14 @@ socket.on('update-connected-players', (unconnected_players) => {
     }
 });
 
-socket.on('player-alert', (msg) => {
-    alert(msg);
-});
-
 //IMPORTANT SOCKET IO HANDLER: this socket event loads the actual page we want
 socket.on('update-content', (content) => {
     document.getElementById('app').innerHTML = content;
-    console.log("Attempting to update app");
+    console.log("Attempting to update page content...");
 });
 
-// End socket.io ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// START SPA dynamic loading  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ########################### SPA loading ########################### //
 
 
 $('#app').on('click', '#startGameButton', () => {
@@ -135,12 +131,12 @@ function startGame() {
     // if(frontEndPlayers[socket.id].playerNumber == host && validateStart() && Object.keys(frontEndPlayers).length > 1) {
     //     socket.emit('start-game'); }
     if(frontEndPlayers[socket.id].playerNumber != host) {
-        alert(`Player ${host} needs to start the game.`);
+        gameEvent(`Player ${host} needs to start the game.`, messages["error"]);
     } else if(Object.keys(frontEndPlayers).length <= 1) {
-        alert("There must be at least 2 players to begin.");
+        gameEvent("There must be at least 2 players to begin.", messages["error"]);
     } else if(!validateStart()) {
         console.log(host, frontEndPlayers[socket.id].playerNumber)
-        alert("All players must enter a name and choose their piece!");
+        gameEvent("All players must enter a name and choose their piece!", messages["error"]);
     } else {
         socket.emit('load-page', ("board"));
         socket.emit('start-game');
@@ -157,11 +153,7 @@ function validateStart() { //make sure every player has chosen a piece and name
     return true;
 }
 
-// END SPA dynamic loading //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//Lobby functions ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ########################### Lobby Functions ########################### //
 function createUserForm(id) {
     const playerNumber = (frontEndPlayers[id].playerNumber).toString()
     const $playerContainer = $("#" + playerNumber);
@@ -228,13 +220,33 @@ function getLowestPlayerNumber() { //basically choose who can start the game
     return min;
 }
 
-//END lobby functions ***************************************************************************************************************************************************************************************************************************************
-//////////////////////////////////////////////////////////////////////////////////////////
-// CHAT
+// ########################### Chat ########################### //
 $(document).ready(() => {
     makeDraggable("#chat", "#dragHandle");
     makeResizeable("#chat", "#resizeHandle");
 });
+
+socket.on('game-event', (msg, color) => {
+    const gameEventChat = $("#gameEventChat");
+    const newMessage = $("<div>").text(`${msg}`);
+    newMessage.css("color", color);
+    gameEventChat.append(newMessage);
+
+    //Scroll to the bottom to see the latest messages
+    const parentElement = $("#eventContainer")[0]; // Get the DOM element, not the jQuery object
+    parentElement.scrollTop = parentElement.scrollHeight;
+});
+
+function gameEvent(msg, color) {
+    const gameEventChat = $("#gameEventChat");
+    const newMessage = $("<div>").text(`${msg}`);
+    newMessage.css("color", color);
+    gameEventChat.append(newMessage);
+
+    //Scroll to the bottom to see the latest messages
+    const parentElement = $("#eventContainer")[0]; // Get the DOM element, not the jQuery object
+    parentElement.scrollTop = parentElement.scrollHeight;
+}
 
 function makeDraggable(containerSelector, handleSelector) {
     let isDragging = false;
@@ -292,7 +304,6 @@ $("#send-button").click((e) => {
     e.preventDefault();
     //get the msg from the input box
     const msg = $("#msg-input").val();
-    console.log("MESSAGE:", msg)
     //make sure an empty string isn't being sent
     if(msg.trim() === '') {
         socket.emit('send-message', null, "Enter a message before sending.");
@@ -316,7 +327,8 @@ socket.on('msg-incoming', (msg) => {
     messageContainer.append(newMessage);
 
     //Scroll to the bottom to show the latest messages
-    messageContainer.scrollTop(messageContainer[0].scrollHeight);
+    const parentElement = $('#chatContainer')[0]; // Get the DOM element, not the jQuery object
+    parentElement.scrollTop = parentElement.scrollHeight;
 });
 
 /*** Socketio for the game itself ***/
@@ -336,11 +348,13 @@ socket.on('land-purchase', (propertyName, propertyPrice) => {
     $('#modal').css('visibility', 'visible');
     $('#purchase-yes').on('click', () => {
         socket.emit('purchase-decision', propertyName, true);
-        $('#modal').hide();
+        $('#modal').empty();
+        $('#modal').css('visibility', 'hidden');
     });
     $('#purchase-no').on('click', () => {
         socket.emit('purchase-decision', propertyName, false);
-        $('#modal').hide();
+        $('#modal').empty();
+        $('#modal').css('visibility', 'hidden');
     });
 });
 function createPurchaseModal(spaceName, propertyPrice) {
@@ -356,7 +370,7 @@ function createPurchaseModal(spaceName, propertyPrice) {
 // ########################### Auction Handling ########################### //
 
 socket.on('auction-started', (spaceName, spacePrice) => {
-    alert(`Auction for ${spaceName} has started!\nStarting bid is ${spacePrice}`);
+    gameEvent(`Auction for ${spaceName} has started!\nStarting bid is ${spacePrice}`, messages["info"]);
     console.log(`Auction for ${spaceName} has started!\nStarting bid is ${spacePrice}`);
 });
 
@@ -409,9 +423,9 @@ function createAuctionModal(spaceName, currentBid, currentBidder) {
 socket.on('auction-ended', (auction_info) => {
     if(auction_info.currentBidderID === null) {
         console.log(`No one bid on ${auction_info.propertyName}.\n Game continues...`)
-        alert(`No one bid on ${auction_info.propertyName}.\n Game continues...`);
+        gameEvent(`No one bid on ${auction_info.propertyName}.\n Game continues...`, messages["info"]);
     } else {
         console.log(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`);
-        alert(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`);
+        gameEvent(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`, messages["info"]);
     }
 });

@@ -13,11 +13,6 @@
       crossorigin="anonymous">
     </script>
     <!-- boostrap import -->
-    <script 
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
-      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" 
-      crossorigin="anonymous">
-    </script>
     <!-- front-end code import -->
     <script type="module" src="./js/frontend.js"></script>
   </head>
@@ -25,14 +20,25 @@
   <body>
     <h1>MONOPOLYTECHNIC</h1>
     <div id="chat" class="draggable resizable">
-      <div id="dragHandle" class="drag-handle">Drag me</div>
-      <div id="resizeHandle" class="resize-handle">Resize Chat</div>
-      <div id="chat-messages">
+      <div id="dragHandle"><img src="./img/drag.png" width="20px"></div>
+      <div id="resizeHandle"><img src="./img/resize.png" width="20px"></div>
+      <div id="chatContainer">
+        
+        <div id="chat-messages">
+
+        </div>
       </div>
-      <form id="chat-form" method="post">
-          <input type="text" id="msg-input" name="message" placeholder="Enter a message..." maxlength="500" autocomplete="off">
-          <button type="submit" id="send-button">Send</button>
-      </form>
+      <div id="chatbox">
+        <form id="chat-form" method="post">
+          <input type="text" id="msg-input" class="form-control" name="message" placeholder="Enter a message..." maxlength="500" autocomplete="off">
+          <button type="button" id="send-button" class="btn btn-primary">Send</button>
+        </form>
+      </div>
+      <div id="eventContainer">
+        <div id="gameEventChat">
+          <p>Game Events here</p>
+        </div>
+      </div>
     </div>
     <div id="app"> <!--SPA element: this div will contain the content for the page, loaded in using javascript-->
       
