@@ -21,7 +21,7 @@ socket.on('updateLobby', (backEndPlayers) => {
                 name: backEndPlayer.name,
                 piece: backEndPlayer.piece,
                 money: backEndPlayer.money,
-                position:backEndPlayer.position,
+                currentPosition:backEndPlayer.currentPosition,
                 inJail:backEndPlayer.inJail,
                 outOfJailCards:backEndPlayer.outOfJailCards,
                 turnsInJail: backEndPlayer.turnsInJail,
@@ -30,14 +30,14 @@ socket.on('updateLobby', (backEndPlayers) => {
         } else { //player exists on the front end and back end
 
             //Update the player's info
-            frontEndPlayers[id].name = backEndPlayer.name,
-            frontEndPlayers[id].piece = backEndPlayer.piece,
-            frontEndPlayers[id].money = backEndPlayer.money,
-            frontEndPlayers[id].position = backEndPlayer.position,
-            frontEndPlayers[id].inJail = backEndPlayer.inJail,
-            frontEndPlayers[id].outOfJailCards = backEndPlayer.outOfJailCards,
-            frontEndPlayers[id].turnsInJail = backEndPlayer.turnsInJail,
-            frontEndPlayers[id].playerNumber = backEndPlayer.playerNumber 
+            frontEndPlayers[id].name = backEndPlayer.name;
+            frontEndPlayers[id].piece = backEndPlayer.piece;
+            frontEndPlayers[id].money = backEndPlayer.money;
+            frontEndPlayers[id].currentPosition = backEndPlayer.currentPosition;
+            frontEndPlayers[id].inJail = backEndPlayer.inJail;
+            frontEndPlayers[id].outOfJailCards = backEndPlayer.outOfJailCards;
+            frontEndPlayers[id].turnsInJail = backEndPlayer.turnsInJail;
+            frontEndPlayers[id].playerNumber = backEndPlayer.playerNumber;
 
             if(inLobby) {
                 if(id === socket.id) { //if this is the player connected:
@@ -56,6 +56,31 @@ socket.on('updateLobby', (backEndPlayers) => {
         }
     }
     //console.log(frontEndPlayers);
+});
+
+// updates the location of pieces on the board
+socket.on('update-pieces', (backEndPlayers) => {
+    for(const id in backEndPlayers) {
+        frontEndPlayers[id] = backEndPlayers[id];
+        const pieceMapLocation = $(`#space${backEndPlayers[id].currentPosition} .${backEndPlayers[id].playerNumber}`);
+        if(pieceMapLocation.find("img").length === 0) {
+            const piece = $(`<img>`); //create a new image element
+            piece.attr({
+                "z-index": "100",
+                "src": `../img/${backEndPlayers[id].piece}.png`,
+                "alt": `${backEndPlayers[id].piece} piece`,
+                "width": "20px",
+                "height": "20px"
+            });
+            pieceMapLocation.append(piece);
+        }
+        
+    }
+});
+
+socket.on('remove-piece', (id) => {
+    const pieceMapLocation = $(`#space${frontEndPlayers[id].currentPosition} .${frontEndPlayers[id].playerNumber}`);
+    pieceMapLocation.empty();
 });
 
 // updates the front end pieces 
@@ -125,7 +150,6 @@ function startGame() {
 
 function validateStart() { //make sure every player has chosen a piece and name
     for(const id in frontEndPlayers) {
-        console.log(id, frontEndPlayers[id]);
         if(!frontEndPlayers[id].name || !frontEndPlayers[id].piece) {
             return false;
         }

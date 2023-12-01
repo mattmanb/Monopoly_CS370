@@ -45,7 +45,7 @@ const backEndPlayers = {} // dictionary of backend players with key=socket.id an
 
 var backEndPieces = ["Thimble", "Shoe", "Top Hat", 
                      "Wheelbarrow", "Battleship", 
-                     "Racecar", "Dog", "Cat"];
+                     "Racecar", "Dog", "Iron"];
 
 var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -86,7 +86,12 @@ io.on('connection', (socket) => {
                 backEndPieces.push(backEndPlayers[socket.id].piece);
             }
             delete backEndPlayers[socket.id];
-            io.emit('update-connected-players', availablePlayers);
+            if(inLobby) {
+                io.emit('update-connected-players', availablePlayers);
+            } else {
+                console.log("A player disconnected!");
+            }
+            
         });
 
         // front end post to update a user's data
@@ -144,6 +149,7 @@ io.on('connection', (socket) => {
         // ########################### Gameflow (Turns, rolling dice, etc.) ########################### //
 
         socket.on('start-game', () => {
+            io.emit('update-pieces', backEndPlayers);
             inLobby = false;
             i = 0 ;
             // Set turn order (still need to randomize it, for now it is default order 1-8)
@@ -172,8 +178,11 @@ io.on('connection', (socket) => {
                 // Check if player already rolled this turn
                 if(!diceRolled) {
                     console.log("It is this players turn");
+                    // Remove the player from the current position on the board
+                    io.emit('remove-piece', socket.id);
                     // Rolls dice and stores info in array (bool rolledDoubles, int numDoubles, int diceTotal, int currentPosition)
                     rollInfo = backEndPlayers[socket.id].rollAndMove(0, board, socket);
+                    io.emit('update-pieces', backEndPlayers);
                     space = board.spaces[rollInfo[3]];
 
                     // Checking if doubles were rolled
@@ -317,6 +326,9 @@ io.on('connection', (socket) => {
 
 setInterval(() => {
     io.emit('updateLobby', backEndPlayers)
+    if(!inLobby) {
+        io.emit('update-pieces', backEndPlayers);
+    }
 }, 1000);
 
 //listen on the port
