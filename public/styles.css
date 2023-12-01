@@ -178,20 +178,23 @@ h6 {
   width: 160px;
   height: 120px;
 }
-/*
-.deck .chanced{
-  border: 2px dashed #080808;
-  width: 160px;
-  height: 120px;
-  background-color: orange;
-}
+
 .deck .communityd{
-    border: 2px dashed #080808;
-    width: 160px;
-    height: 120px;
-    background-color: lightyellow;
-  } working on these two for background colors of cards
-*/
+  background-color: rgb(236, 218, 56);
+  width: calc(100% - 0.5px);
+  height: calc(100% - 0.5px);
+  text-align: center;
+  justify-content: center;
+}
+
+
+.deck .chanced{
+  background-color: rgb(255, 80, 80);
+  width: calc(100% - 0.5px);
+  height: calc(100% - 0.5px);
+  text-align: center;
+}
+
 .row {
   display: grid;
   grid-gap: 2px;
@@ -259,7 +262,7 @@ h6 {
   padding-right: 15px;
 }
 .space .price {
-  font-size: 7px;
+  font-size: 10px;
   font-weight: 400;
   padding-bottom: 5px;
 }
@@ -325,7 +328,7 @@ h6 {
 .CC .drawing {
   grid-column: 4/11;
   grid-row: 1/8;
-  width: 90px;
+  width: 88px;
   height: 90px;
   background: #d65c15;
   border-bottom: 2px solid #080808;
@@ -463,6 +466,11 @@ h6 {
   background: #dddddd;
   cursor: pointer;
 }
+
+.pill:not(.pill--selected):hover {
+  background-color: #cccccc;
+}
+
 .pill--selected {
   background-color: #009578;
   color: white;
@@ -507,4 +515,124 @@ h6 {
 
 .draggable {
   user-select: none;
+}
+
+.parent{
+  display: grid;
+  grid-template-columns: repeat(4, 30px);
+  grid-template-rows: repeat(2, 20px);
+  position:absolute;
+}
+
+.parent > div { 
+  padding-top: 40px;
+  border-radius: 10px;
+  border-color: black;
+  display:grid;
+  place-content: center;
+}
+
+.parent-small{
+  display: grid;
+  grid-template-columns: repeat(4, 20px);
+  grid-template-rows: repeat(2, 20px);
+  position:absolute;
+}
+.parent-small > div{
+
+  padding-top: 30px;
+  border-radius: 10px;
+  border-color: black;
+  display:grid;
+  place-content: center;
+}
+
+.parent-small-top{
+  display: grid;
+  grid-template-columns: repeat(4, 20px);
+  grid-template-rows: repeat(2, 20px);
+  position:absolute;
+  transform-origin: bottom;
+  transform:rotate(180deg);
+}
+
+.parent-small-top > div{
+  padding-top: 30px;
+  border-radius: 10px;
+  border-color: black;
+  display:grid;
+  place-content: center;
+}
+
+.parent-small-corner{
+  display: grid;
+  grid-template-columns: repeat(4, 15px);
+  grid-template-rows: repeat(2, 20px);
+  position:absolute;
+}
+
+.parent-small-corner > div{
+
+  padding-top: 0px;
+  border-radius: 10px;
+  border-color: black;
+  display:grid;
+  place-content: center;
+}
+
+.parent-small-left{
+  display: grid;
+  grid-template-columns: repeat(4, 20px);
+  grid-template-rows: repeat(2, 20px);
+  position:absolute;
+  transform-origin: bottom;
+  transform:rotate(90deg);
+}
+
+.parent-small-left > div{
+  padding-top: 30px;
+  border-radius: 10px;
+  border-color: black;
+  display:grid;
+  place-content: center;
+}
+
+.card-img{
+  height: 85%;
+  width: auto;
+  position:relative;
+  padding-top: 15%;
+}
+
+.dorm-img{
+  height: 75%;
+  width:auto;
+}
+
+.img-div{
+  justify-content: center;
+  overflow: hidden;
+  padding-top:20%;
+}
+
+.chest-img{
+  height:100%;
+  width:auto;
+}
+
+.parent-small-right{
+  display: grid;
+  grid-template-columns: repeat(4, 20px);
+  grid-template-rows: repeat(2, 20px);
+  position:absolute;
+  transform-origin: bottom;
+  transform:rotate(-90deg);
+}
+
+.parent-small-right > div{
+  padding-top: 70px;
+  border-radius: 10px;
+  border-color: black;
+  display:grid;
+  place-content: center;
 }
