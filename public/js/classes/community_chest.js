@@ -29,9 +29,9 @@ export class community_chest {
             new card(comChestDeck[1], () => money(player, 200)),
             new card(comChestDeck[2], () => money(player, -150)),
             new card(comChestDeck[3], () => money(player, 50)),
-            new card(comChestDeck[4]),
+            new card(comChestDeck[4], () => outOfCC(player)),
             new card(comChestDeck[5], () => teleport(player, 40)),
-            new card(comChestDeck[6]),
+            new card(comChestDeck[6], () => moneyEveryone(player, 50)),
             new card(comChestDeck[7], () => money(player, 100)),
             new card(comChestDeck[8], () => money(player, 20)),
             new card(comChestDeck[9], () => money(player, 10)),
@@ -39,13 +39,14 @@ export class community_chest {
             new card(comChestDeck[11], () => money(player, -100)),
             new card(comChestDeck[12], () => money(player, -150)),
             new card(comChestDeck[13], () => money(player, 25)),
-            new card(comChestDeck[14]),
+            new card(comChestDeck[14], () => repair(player, 1)),
             new card(comChestDeck[15], () => money(player, 10)),
             new card(comChestDeck[16], () => money(player, 100))
         );
     }
 
     shuffle() {
+        //Fisher-Yates
 
     }
 

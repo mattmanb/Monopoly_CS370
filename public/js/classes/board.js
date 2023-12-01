@@ -334,14 +334,14 @@ class board {
             if(space.special_condition) {
                 space.executeSpecialCondition(player)
             } else {
-                space.pullChanceCard(player); //implement pullChanceCard method for chancecard (Maybe do a chance deck class to instantiate the deck and shuffle)
+                space.giveChanceCard(player); //implement pullChanceCard method for chancecard (Maybe do a chance deck class to instantiate the deck and shuffle)
             }
         }
         else if(space instanceof Community_Chest_Card) {
             if(space.special_condition) {
                 space.executeSpecialCondition(player);
             } else {
-                space.pullCommunityChestCard(player); 
+                space.giveCommunityChestCard(player); 
                 //implement pullCommunityChestCard method for com chest (Maybe do a community chest deck class to instantiate the deck and shuffle)
             }
         }
@@ -362,6 +362,10 @@ class board {
         else {
             // Commenting this out for now, sendToJail is called on just visiting space as well
             // space.sendToJail(player); //send this player to jail
+
+            //because there are cards that send players to jail, I have this function in card.js
+            //It can be activated with teleport(player, 40)
+            //Brandon
         }
     }
     isMonopoly(space_ind) {

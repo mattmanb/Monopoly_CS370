@@ -1,6 +1,6 @@
 // Player class
 class player {
-    constructor({ name = null, piece = null, money = 1500, position = 0, inJail = false, outOfJailCards = 0, turnsInJail = 0, playerNumber}) {
+    constructor({ name = null, piece = null, money = 1500, position = 0, inJail = false, outOfJailCards = 0, turnsInJail = 0, playerNumber, housesOwned = 0, hotelsOwned = 0}) {
         this.name = name;
         this.piece = piece;
         this.money = money;
@@ -9,6 +9,9 @@ class player {
         this.outOfJailCards = outOfJailCards;
         this.turnsInJail = turnsInJail;
         this.playerNumber = playerNumber;
+        //Can we add number of active houses and hotels?
+        this.housesOwned = housesOwened;
+        this.hotelsOwned = hotelsOwned;
     }
 
     addMoney(money) {

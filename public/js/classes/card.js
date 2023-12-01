@@ -23,11 +23,10 @@ export class Card {
                 pos = 28;
             }
             //if bridge unowned, creawte opportunity to buy utility
-
             //if bridge is owned, pay ten times amount rolled on dice
             num1 = rollDice();
             num2 = rollDice();
-            tot = addDice(num1, num2);
+            tot = addDice(num1, num2) * 10;
         }
 
         //Player must go to nearest dorm (RR)
@@ -44,8 +43,9 @@ export class Card {
             else {
                 pos = 35;
             }
+            //if dorm unowned, create buy opportunity
+            // if dorm owned, pay twice amount
         }
-
 
         //player passes Go and not directly to jail
         if (pos < player.currentPosition && pos != 40) {
@@ -60,90 +60,31 @@ export class Card {
         player.money += x;
     }
     
-    advanceBridge(player) {
-        //identify nearest ult
-        //move player to nearest bridge (utility)
-        //if pass Go collect 200
-        //if unowned buy oppurtunity
-        //else pay owner ten times amount on dice
-    }
-    
-    advanceDorm(player) {
-        //identify nearrest dorm
-        //move player to nearest dorm
-        //if pass Go collect 200
-        //if unowned buy oppurtunity
-        //else pay owner twice owned
-    }
-    
-    bursarRaffle(player) {
-        //get 50
-    }
-    
     outOfCC(player) {
         //add to inventory
         player.outOfJailCards++;
     }
     
-    backThree(player) {
-        //move player three spaces back
+    repair(player, isStreet) {
+        if(isStreet) {
+            tot = (player.housesOwned * 45) + (player.hotelsOwned * 115);
+        }
+        else{
+            tot = (player.housesOwned * 25) + (player.hotelsOwned * 100);
+        }
+        player.money += tot;
     }
     
-    eatAtCC(player) {
-        //go to cc jail
-    }
-    
-    generalRepair(player) {
-        //get classrooms
-        //pay 25 each
-        //get lecture halls
-        //pay 100 each
-    }
-    
-    classPresident(player) {
+    moneyEveryone(player, x) {
+        let playerCount = Object.keys(backEndPlayers).length;
+        //get an array containing all players
+        for(playerCount; playerCount > 0; playerCount--) {
+            //if this player isn't the player that drew the card
+            //give or take 50
+
+        }
         //give each other player 50
-    }
-    paidInternship(player) {
-        //collect 150
-    }
-    
-    midtermsRetailVenmoSidewalk(player) {
-        //collect 100
-    }
-
-    bursarError(player) {
-        //collect 200
-    }
-
-    parkingFee(player) {
-        //pay 50
-    }
-
-    movieNight(player) {
-        //get 50 from each player
-    }
-
-    loansRefund(player) {
-        //collect 20
-    }
-
-    birthdayVending(player) {
-        //get 10
-    }
-
-    partyDamamge(player) {
-        //pay 100
-    }
-
-    tutor(player) {
-        //get 25
-    }
-
-    streetRepair(player) {
-        //get classrooms
-        //pay 45 each
-        //get lecture halls
-        //pay 115 each
+        player.money + x;
     }
 
     getCardInfo() {
