@@ -6,14 +6,26 @@ const Utility = require('./utility.js');
 const Avenue = require('./avenue.js')
 const Special_Event = require('./special_event.js');
 const Card = require('./card.js');
+const Card_Deck = require('./card_deck.js');
 
 class board {
-    constructor(io) {
-        this.io = io;
-        this.Chance_Card_Deck = new Chance_Deck();
-        this.Community_Card_Deck = new Community_Deck();
+    constructor(players) {
+        //list of all the spaces (each space is an object)
         this.spaces = [];
+
+        //list of all the avenues
         this.avenues = [];
+
+        //dictionary of all the players
+        this.players = players;
+
+        //initialize community card deck
+        this.community_deck = new Card_Deck("community", this);
+        this.community_deck.initDeck();
+
+        //initialize chance card deck
+        this.chance_deck = new Card_Deck("chance", this);
+        this.chance_deck.initDeck();
 
         this.spaces[0] = new Special_Event({name:"Go", amount:200});
 
@@ -30,7 +42,7 @@ class board {
             io: this.io });
         this.avenues[0].addProperty(this.spaces[1]); // Add "Commuter Student Lounge" to "Cafeteria Corner"
 
-        this.spaces[2] = this.Community_Card_Deck; //Community Chest Card constructor should handle this
+        this.spaces[2] = this.community_deck; //Community Chest Card constructor should handle this
 
         this.spaces[3] = new Property({
             name:"Glowing Staircase", 
@@ -72,7 +84,7 @@ class board {
             io: this.io });
         this.avenues[1].addProperty(this.spaces[6]);
 
-        this.spaces[7] = this.Chance_Card_Deck; //landOn method should handle this - just denoting this is a chance card space
+        this.spaces[7] = this.chance_deck; //landOn method should handle this - just denoting this is a chance card space
 
         this.spaces[8] = new Property({
             name:"Wildcat Den", 
@@ -151,7 +163,7 @@ class board {
             io: this.io });
         this.avenues[3].addProperty(this.spaces[16]);
 
-        this.spaces[17] = this.Community_Card_Deck;
+        this.spaces[17] = this.community_deck;
 
         this.spaces[18] = new Property({
             name:"Wildcat Grill", 
@@ -187,7 +199,7 @@ class board {
             io: this.io });
         this.avenues[4].addProperty(this.spaces[21]);
 
-        this.spaces[22] = this.Chance_Card_Deck;
+        this.spaces[22] = this.chance_deck;
 
         this.spaces[23] = new Property({
             name:"Mail Room", 
@@ -277,7 +289,7 @@ class board {
             io: this.io });
         this.avenues[6].addProperty(this.spaces[32]);
 
-        this.spaces[33] = this.Chance_Card_Deck;
+        this.spaces[33] = this.chance_deck;
 
         this.spaces[34] = new Property({
             name:"Cayan Library", 
@@ -295,7 +307,7 @@ class board {
             mortgage:100, 
             io: this.io });
     
-        this.spaces[36] = this.Chance_Card_Deck;
+        this.spaces[36] = this.chance_deck;
 
         this.avenues[7] = new Avenue({ name:"Innovation Plaza", color:"dark-blue", spaces:[37, 39] });
 
@@ -323,7 +335,7 @@ class board {
 
         this.spaces[40] = "In jail";
     }
-    landOn(player, space_number) {
+    landOn(player, space_number, diceTotal) {
         let space = this.spaces[space_number];
         if(space instanceof Property) {
             if(space.isOwned()) { //if the property is owned, make the player who landed here pay rent
@@ -336,10 +348,8 @@ class board {
         else if(space instanceof Special_Event) { //IMPLEMENT THIS
             return;
         }
-        else if(space instanceof Chance_Deck) { //IMPLEMENT THIS
-            return;
-        }
-        else if(space instanceof Community_Deck) { //IMPLEMENT THIS
+        else if(space instanceof Card_Deck) { 
+            space.pullCard(player)
             return;
         }
         else if(space instanceof Railroad) {
@@ -351,7 +361,7 @@ class board {
         }
         else if(space instanceof Utility) {
             if(space.isOwned()) {
-                space.payRent(player);
+                space.payRent(player, diceTotal);
             } else {
                 console.log("Utility is not owned");
             }
@@ -361,7 +371,7 @@ class board {
         }
     }
     isMonopoly(space_ind) {
-        if(!(board[space_ind] instanceof property)) {
+        if(!(board[space_ind] instanceof Property)) {
             console.log("Checking for a non-property monopoly!");
             return;
         }

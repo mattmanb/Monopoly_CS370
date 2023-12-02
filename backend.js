@@ -180,7 +180,7 @@ io.on('connection', (socket) => {
                     // Remove the player from the current position on the board
                     io.emit('remove-piece', socket.id);
                     // Rolls dice and stores info in array (bool rolledDoubles, int numDoubles, int diceTotal, int currentPosition)
-                    rollInfo = backEndPlayers[socket.id].rollAndMove(0, board, socket);
+                    rollInfo = backEndPlayers[socket.id].rollAndMove(0, board);
                     io.emit('update-pieces', backEndPlayers);
                     io.emit('game-event', (backEndPlayers[socket.id].name + " rolled " + rollInfo[2] + " and landed on " + board.spaces[rollInfo[3]].name + "."), messages["info"]);
                     space = board.spaces[rollInfo[3]];
@@ -200,8 +200,8 @@ io.on('connection', (socket) => {
                         socket.emit('game-event', '3 doubles! Go to jail!', messages["error"]);
                         diceRolled = true;
                     }
-
-                    if (space instanceof Property || space instanceof Railroad || space instanceof Utility) {
+                    // if the player landed a purchasable space, see if they want to buy it
+                    if (space instanceof Property || space instanceof Railroad || space instanceof Utility && space.owner === null) {
                         console.log("Space is a purchaseable");
                         socket.emit('land-purchase', space.name, space.price);
                     } 
@@ -265,6 +265,10 @@ io.on('connection', (socket) => {
                 io.emit('game-event', `${backEndPlayers[socket.id].name} has purchased ${space.name}!`, messages["info"]);
                 console.log(`${backEndPlayers[socket.id].name} has purchased ${space.name}!`);
                 console.log(`The owner of ${space.name} is ${space.owner.name}.`);
+                if(space instanceof Railroad) {
+                    //we must keep track of number of railroads owned to calculate rent
+                    backEndPlayers[socket.id].railroadsOwned++;
+                }
             } else {
                 io.emit('game-event', `${backEndPlayers[socket.id].name} has declined to purchase ${space.name}.`, messages["info"]);
                 console.log(`${backEndPlayers[socket.id].name} has declined to purchase ${space.name}.`);
@@ -341,11 +345,6 @@ server.listen(port, () => {
     console.log(`Server listening on port ${port}`)
 });
 
-/* BEGIN MONOPOLY GAMEFLOW */
-// board object with all board spaces and a ton of data
-const board = new Board(io);
-var currentBid = 0;
-
 //THIS FUNCTION IS WRONGGGGGGGGGGGGGGGGGGGGGGGG (bidOrder and bidOrderInd need to be changed)
 function startAuction(space) {
     // Start the auction
@@ -376,4 +375,9 @@ function setOwner(spaceName, ownerID) {
     space.owner = backEndPlayers[ownerID];
     return;
 }
-// ########################### Misc ########################### //
+
+
+/* BEGIN MONOPOLY GAMEFLOW */
+// board object with all board spaces and a ton of data
+const board = new Board(backEndPlayers);
+var currentBid = 0;

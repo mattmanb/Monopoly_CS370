@@ -1,147 +1,100 @@
 class card {
-    constructor(text, action) {
-        this.text = text;
-        this.action = action;
+    constructor({description, event, position = 0, amount = 0, board, isStreet = false}) {
+        this.description = description;
+        this.event = event; //just a string to determine what happens
+        this.position = position;
+        this.amount = amount;
+        this.board = board;
+        this.isStreet = isStreet;
     }
 
     performAction(player) {
-        if(typeof this.action === 'function') {
-            this.action(player)
+        console.log(this.description);
+        if(this.event === "teleport") {
+            this.teleport(player);
+        } else if(this.event === "money") {
+            this.money(player);
+        } else if(this.event === "jail") {
+            player.goToJail();
+        } else if(this.event === "payAll") {
+            this.moneyEveryone(player);
+        } else if(this.event === "getOutOfCC") {
+            this.outOfCC(player);
+        } else if(this.event === "repair") {
+            this.repair(player);
         }
-        //console.log(`Get a paid internship—Collect $${money}`);
     }
 
-    teleport(player, pos) {
+    teleport(player) {
         //Player must go to nearest bridge (utility)
-        if(pos == -1) {
+        if(this.position == -1) {
             if (player.currentPosition < 12 || player.currentPosition >= 28) {
-                pos = 12;
+                this.position = 12;
             }
             else {
-                pos = 28;
+                this.position = 28;
             }
-            //if bridge unowned, creawte opportunity to buy utility
 
             //if bridge is owned, pay ten times amount rolled on dice
-            num1 = rollDice();
-            num2 = rollDice();
-            tot = addDice(num1, num2);
+            num1 = player.rollDice();
+            num2 = player.rollDice();
+            diceTotal = num1 + num2;
+            player.teleport(this.position, this.board, diceTotal);
         }
 
         //Player must go to nearest dorm (RR)
-        else if ( pos == -2) {
+        else if (this.position == -2) {
             if (player.currentPosition < 5 || player.currentPosition >= 35) {
-                pos = 5;
+                this.position = 5;
             }
             else if(player.currentPosition >= 5 && player.currentPosition < 15) {
-                pos = 15;
+                this.position = 15;
             }
             else if(player.currentPosition >= 15 && player.currentPosition < 25) {
-                pos = 25;
+                this.position = 25;
             }
             else {
-                pos = 35;
+                this.position = 35;
             }
+            // player owes double the rent for this
+            player.teleport(this.position, this.board, 0);
+            player.teleport(this.position, this.board, 0);
+        } else if(this.position === -3) {
+            player.teleport(player.currentPosition - 3, this.board, -1);
         }
-
-
-        //player passes Go and not directly to jail
-        if (pos < player.currentPosition && pos != 40) {
-            player.money += 200;
+        else {
+            //set player position
+            player.teleport(this.position, this.board, 0);
         }
-        //set player position
-        player.currentPosition = pos;
-        socket.emit('update-player', player) // emits new pos to the backend
     }
 
-    money(player,x) {
-        player.money += x;
-    }
-
-    advanceBridge(player) {
-        //identify nearest ult
-        //move player to nearest bridge (utility)
-        //if pass Go collect 200
-        //if unowned buy oppurtunity
-        //else pay owner ten times amount on dice
-    }
-
-    advanceDorm(player) {
-        //identify nearrest dorm
-        //move player to nearest dorm
-        //if pass Go collect 200
-        //if unowned buy oppurtunity
-        //else pay owner twice owned
-    }
-
-    bursarRaffle(player) {
-        //get 50
+    money(player) {
+        player.addMoney(this.amount);
     }
 
     outOfCC(player) {
         //add to inventory
         player.outOfJailCards++;
     }
-
-    backThree(player) {
-        //move player three spaces back
+    
+    repair(player) {
+        if(this.isStreet) {
+            tot = (player.housesOwned * 45) + (player.hotelsOwned * 115);
+        }
+        else{
+            tot = (player.housesOwned * 25) + (player.hotelsOwned * 100);
+        }
+        player.addMoney(tot);
     }
 
-    eatAtCC(player) {
-        //go to cc jail
-    }
-
-    generalRepair(player) {
-        //get classrooms
-        //pay 25 each
-        //get lecture halls
-        //pay 100 each
-    }
-
-    classPresident(player) {
-        //give each other player 50
-    }
-    paidInternship(player) {
-        //collect 150
-    }
-
-    midtermsRetailVenmoSidewalk(player) {
-        //collect 100
-    }
-
-    bursarError(player) {
-        //collect 200
-    }
-
-    parkingFee(player) {
-        //pay 50
-    }
-
-    movieNight(player) {
-        //get 50 from each player
-    }
-
-    loansRefund(player) {
-        //collect 20
-    }
-
-    birthdayVending(player) {
-        //get 10
-    }
-
-    partyDamamge(player) {
-        //pay 100
-    }
-
-    tutor(player) {
-        //get 25
-    }
-
-    streetRepair(player) {
-        //get classrooms
-        //pay 45 each
-        //get lecture halls
-        //pay 115 each
+    moneyEveryone(player) {
+        allPlayers = this.board.players;
+        for(const id in allPlayers) {
+            if(allPlayers[id] !== player) {
+                allPlayers[id].addMoney(-1*this.amount);
+                player.addMoney(this.amount);
+            }
+        }
     }
 
     getCardInfo() {

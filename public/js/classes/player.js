@@ -9,6 +9,9 @@ class player {
         this.outOfJailCards = outOfJailCards;
         this.turnsInJail = turnsInJail;
         this.playerNumber = playerNumber;
+        this.railroadsOwned = 0;
+        this.houses = 0;
+        this.motels = 0;
     }
 
     addMoney(money) {
@@ -30,6 +33,15 @@ class player {
         }
         return;
     }
+    // this is for card stuff
+    teleport(pos, board, diceTotal) {
+        this.currentPosition = pos;
+        // if diceTotal is -1, the player is moving back 3 spaces (should not pass go)
+        if (pos < this.currentPosition && diceTotal !== -1) {
+            this.money += 200;
+        }
+        board.landOn(this, this.currentPosition, diceTotal);
+    }
     setPosition(pos) {
         this.currentPosition = pos;
         return;
@@ -44,7 +56,7 @@ class player {
         else
             return false
     }
-    rollAndMove(numDoubles = 0, board, socket) { //set default numDoubles to 0 (if a number gets passed in the default gets overridden)
+    rollAndMove(numDoubles = 0, board) { //set default numDoubles to 0 (if a number gets passed in the default gets overridden)
         // Roll 2 dice
         const dice1 = this.rollDice()
         const dice2 = this.rollDice()
@@ -70,7 +82,7 @@ class player {
         console.log(`Player position: ${this.currentPosition}`);
 
         // Land on that space and do appropriate action
-        board.landOn(this, this.currentPosition, socket);
+        board.landOn(this, this.currentPosition, diceTotal);
 
         return [rolledDoubles, numDoubles, diceTotal, this.currentPosition] ;
     }

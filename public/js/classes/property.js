@@ -23,7 +23,7 @@ class property{ //color to be implemented in street.js
     }
     payRent(player) {
         if(this.owner !== player) {
-            if(this.isMonopoly()) {
+            if(isMonopoly()) {
                 //THIS NEEDS TO BE CHANGED
                 player.addMoney(this.rent[rentLevel] * -1 * 2); //if its a monopoly rent doubles
             } else {
