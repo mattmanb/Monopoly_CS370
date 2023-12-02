@@ -43,6 +43,7 @@ export class community_chest {
             new card(comChestDeck[15], () => money(player, 10)),
             new card(comChestDeck[16], () => money(player, 100))
         );
+        shuffle(this.cards);
     }
 
     shuffle() {
@@ -51,24 +52,12 @@ export class community_chest {
     }
 
     drawCard() {
-        if(communityChestGameDeck.length <= 1) {
-        communityChestGameDeck = communityChestDeck;
-    }
-    let randomIndex = Math.floor(Math.random() * communityChestGameDeck.length);
-    let cardDelt = communityChestGameDeck[randomIndex];
-    communityChestGameDeck.splice(randomIndex, 1);
-
-    if(cardDelt == "Get Out of CC Free") 
-        player.outOfJailCards++;
-    return cardDelt;
-
+       
     }
 
     resetDeck() {
         
-    }
-
-    
+    } 
 
 }
 
@@ -77,4 +66,13 @@ function giveCommunityChestCard(player) {
     const drawnCard = community_chest.drawCard();
     console.log(`Drawn card: $(drawnCard.text)`);
     drawnCard.performAction(player);
+}
+
+//Shuffle the deck of cards
+function shuffle(arr) {
+    //Fisher-Yates shuffle
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
 }

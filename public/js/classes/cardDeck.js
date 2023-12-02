@@ -43,25 +43,11 @@ export class chance_deck {
             new card(chanceDeck[15], () => money(player, 100)),
             new card(chanceDeck[16], () => moneyEveryone(player, 50))
         );
-    }
-
-    shuffle() {
-        //Fisher-Yates shuffle?
-
+        shuffle(this.cards);
     }
 
     drawCard() {
-        if(chanceGameDeck.length <= 1) {
-            chanceGameDeck = chanceDeck;
-        }
-        let randomIndex = Math.floor(Math.random() * chanceGameDeck.length);
-        let cardDelt = chanceGameDeck[randomIndex];
-        chanceGameDeck.splice(randomIndex);
-
-        if(cardDelt == "Get Out of CC Free")
-            player.outOfJailCards++;
-
-        return cardDelt;
+        
 
     }
 
@@ -75,4 +61,21 @@ function giveChanceCard(player) {
     const drawnCard = chance.drawCard();
     console.log(`Drawn card: $(drawnCard.text)`);
     drawnCard.performAction(player);
+}
+
+function StudentLoans(player) {
+    if((player.money * 0.1) < 200) {
+        player.money += (player.money * -0.1);
+    }
+    else {
+        player.money += -200;
+    }
+}
+
+function shuffle(arr) {
+    //Fisher-Yates shuffle
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
 }

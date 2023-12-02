@@ -22,7 +22,7 @@ export class Card {
             else {
                 pos = 28;
             }
-            //if bridge unowned, creawte opportunity to buy utility
+            //if bridge unowned, create opportunity to buy utility
             //if bridge is owned, pay ten times amount rolled on dice
             num1 = rollDice();
             num2 = rollDice();
@@ -76,15 +76,18 @@ export class Card {
     }
     
     moneyEveryone(player, x) {
-        let playerCount = Object.keys(backEndPlayers).length;
-        //get an array containing all players
-        for(playerCount; playerCount > 0; playerCount--) {
+        for(const id in backEndPlayers) {
             //if this player isn't the player that drew the card
-            //give or take 50
+            if(player != thatPlayer) {
 
+            }
+            //give or take 50
+            thatPLayer.money -= 50;
+            
+            //get or lose
+            player.money + x;
         }
-        //give each other player 50
-        player.money + x;
+        
     }
 
     getCardInfo() {
