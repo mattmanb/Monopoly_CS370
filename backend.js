@@ -5,12 +5,12 @@
 //this syntax works instead
 const Player = require('./public/js/classes/player.js');
 const Property = require('./public/js/classes/property.js');
-const Chance_Deck = require('./public/js/classes/chance_deck.js');
-const Community_Deck = require('./public/js/classes/community_deck.js');
 const Railroad = require('./public/js/classes/railroad.js');
 const Utility = require('./public/js/classes/utility.js');
 const Avenue = require('./public/js/classes/avenue.js')
 const Board = require('./public/js/classes/board.js');
+const Card = require('./public/js/classes/card.js');
+const Card_Deck = require('./public/js/classes/card_deck.js');
 
 const fs = require('fs');
 
