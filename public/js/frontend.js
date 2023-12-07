@@ -345,16 +345,16 @@ socket.on('land-purchase', (propertyName, propertyPrice) => {
     // const response = confirm(msg);
     const modalContent = createPurchaseModal(propertyName, propertyPrice);
     $('#modal').append(modalContent);
-    $('#modal').css('visibility', 'visible');
+    $('#modal').css("visibility", "visible");
     $('#purchase-yes').on('click', () => {
         socket.emit('purchase-decision', propertyName, true);
         $('#modal').empty();
-        $('#modal').css('visibility', 'hidden');
+        $('#modal').attr("visibility", "invisible");
     });
     $('#purchase-no').on('click', () => {
         socket.emit('purchase-decision', propertyName, false);
         $('#modal').empty();
-        $('#modal').css('visibility', 'hidden');
+        $('#modal').attr("visibility", "invisible");
     });
 });
 function createPurchaseModal(spaceName, propertyPrice) {
@@ -377,25 +377,36 @@ socket.on('auction-started', (spaceName, spacePrice) => {
 socket.on('your-bid', (auction_info) => {
     const modalContent = createAuctionModal(auction_info.propertyName, auction_info.currentBid, auction_info.currentBidderName);
     $('#modal').append(modalContent);
-    $('#modal').css('visibility', 'visible');
+    $('#modal').css("visibility", "visible");
     $('#passButton').on('click', () => {
         console.log('passing');
         socket.emit('bid-pass', auction_info);
-        $('#modal').hide();
+        console.log("Emptying and hiding modal");
+        $('#modal').empty();
+        $('#modal').css("visibility", "invisible");
     });
     $('#submitBid').on('click', () => {
         const bid = parseInt($('#bidBox').val());
-        if (bid < auction_info.currentBid) {
-            console.log('passing, bid too low');
+        console.log("Bid vs currentBid", bid, auction_info.currentBid)
+        console.log("auction_info.currentBidderID === null", auction_info.currentBidderID === null)
+        if (bid < auction_info.currentBid && auction_info.currentBidderID === null) {
+            console.log('passing, starting bid too low');
+            socket.emit('bid-pass', auction_info);
+        } else if(bid <= auction_info.currentBid && auction_info.currentBidderID !== null) {
+            console.log("auction_info.currentBidderID !== null:", auction_info.currentBidderID !== null)
+            console.log('passing, bid lower than current bid', auction_info.currentBid);
             socket.emit('bid-pass', auction_info);
         } else if(bid === NaN) {
             console.log('passing, entered nothing');
             socket.emit('bid-pass', auction_info);
         } else {
+            auction_info.currentBid = bid;
             console.log('submitting bid');
             socket.emit('bid', auction_info, bid);
         }
-        $('#modal').hide();
+        console.log("Emptying and hiding modal");
+        $('#modal').empty();
+        $('#modal').css("visibility", "invisible");
     });
 });
 
@@ -422,8 +433,8 @@ function createAuctionModal(spaceName, currentBid, currentBidder) {
 
 socket.on('auction-ended', (auction_info) => {
     if(auction_info.currentBidderID === null) {
-        console.log(`No one bid on ${auction_info.propertyName}.\n Game continues...`)
-        gameEvent(`No one bid on ${auction_info.propertyName}.\n Game continues...`, messages["info"]);
+        console.log(`No one bid on ${auction_info.spaceForAuction}.\n Game continues...`)
+        gameEvent(`No one bid on ${auction_info.spaceForAuction}.\n Game continues...`, messages["info"]);
     } else {
         console.log(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`);
         gameEvent(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`, messages["info"]);

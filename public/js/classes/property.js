@@ -23,7 +23,7 @@ class property{ //color to be implemented in street.js
     }
     payRent(player) {
         if(this.owner !== player) {
-            if(isMonopoly()) {
+            if(this.checkMonopoly()) {
                 //THIS NEEDS TO BE CHANGED
                 player.addMoney(this.rent[rentLevel] * -1 * 2); //if its a monopoly rent doubles
             } else {
@@ -31,9 +31,9 @@ class property{ //color to be implemented in street.js
             }
         } 
     }
-    isMonopoly() {
+    checkMonopoly() {
         // uses isMonopoly method from the avenue class this property is apart of
-        return this.avenue.isMonopoly();
+        return this.avenue.checkMonopoly();
     }
 }
 module.exports = property;

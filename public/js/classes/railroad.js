@@ -20,7 +20,7 @@ class railroad {
             console.log("Welcome to your property!")
         } else {
             //25 for 1 railroad, 50 for 2, 100 for 3, 200 for all 4
-            player.addMoney(-1 * 25 * 2**(this.owner.railroads.length-1));
+            player.addMoney(-1 * 25 * 2**(this.owner.railroadsOwned-1));
         }
         return;
     }

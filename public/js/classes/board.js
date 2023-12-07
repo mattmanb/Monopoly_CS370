@@ -1,6 +1,4 @@
 const Property = require('./property.js');
-const Chance_Deck = require('./chance_deck.js');
-const Community_Deck = require('./community_deck.js');
 const Railroad = require('./railroad.js');
 const Utility = require('./utility.js');
 const Avenue = require('./avenue.js')
@@ -16,8 +14,8 @@ class board {
         //list of all the avenues
         this.avenues = [];
 
-        //dictionary of all the players
-        this.players = players;
+        //dictionary of all the players (deep copy)
+        this.players = this.deepCopy(players);
 
         //initialize community card deck
         this.community_deck = new Card_Deck("community", this);
@@ -349,8 +347,8 @@ class board {
             return;
         }
         else if(space instanceof Card_Deck) { 
-            space.pullCard(player)
-            return;
+            const msg = space.pullCard(player)
+            return msg;
         }
         else if(space instanceof Railroad) {
             if(space.isOwned()) { //If the railroad is owned, make the play who landed here pay
@@ -358,6 +356,7 @@ class board {
             } else {
                 console.log("Railroad is not owned");
             }
+            return;
         }
         else if(space instanceof Utility) {
             if(space.isOwned()) {
@@ -365,6 +364,7 @@ class board {
             } else {
                 console.log("Utility is not owned");
             }
+            return;
         }
         else {
             // the only other case is nothing happens, in which a message will be displayed... thats it
@@ -391,6 +391,27 @@ class board {
     getSpaceByName(spaceName) {
         return this.spaces.find(space => space.name === spaceName);
     }
+
+    deepCopy(obj) {
+        if (typeof obj !== 'object' || obj === null) {
+          return obj; // Return primitive values as is
+        }
+      
+        if (Array.isArray(obj)) {
+          // If it's an array, create a new array and deep copy its elements
+          return obj.map(deepCopy);
+        }
+      
+        // If it's an object, create a new object and deep copy its properties
+        const newObj = {};
+        for (const key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            newObj[key] = this.deepCopy(obj[key]);
+          }
+        }
+      
+        return newObj;
+      }
 }
 
 module.exports = board;

@@ -11,7 +11,7 @@ class avenue {
     addProperty(property) {
         this.properties.push(property);
     }
-    isMonopoly() {
+    checkMonopoly() {
         ground_owner = this.properties[0].owner;
         for(const property in this.properties) {
             if(property.owner !== ground_owner) {

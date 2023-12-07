@@ -150,6 +150,8 @@ io.on('connection', (socket) => {
             io.emit('update-pieces', backEndPlayers);
             io.emit('game-event', 'Game started!', messages["success"]);
             inLobby = false;
+            // board object with all board spaces and a ton of data
+            board = new Board(backEndPlayers);
             i = 0 ;
             // Set turn order (still need to randomize it, for now it is default order 1-8)
             for (const[key, value] of Object.entries(backEndPlayers)) {
@@ -184,13 +186,16 @@ io.on('connection', (socket) => {
                     io.emit('update-pieces', backEndPlayers);
                     io.emit('game-event', (backEndPlayers[socket.id].name + " rolled " + rollInfo[2] + " and landed on " + board.spaces[rollInfo[3]].name + "."), messages["info"]);
                     space = board.spaces[rollInfo[3]];
+                    console.log("Possible message:", rollInfo[4]);
+                    if(rollInfo[4]) {
+                        io.emit('game-event', rollInfo[4], messages["info"]);
+                    }
 
                     // Checking if doubles were rolled
 
                     numDoubles = rollInfo[1];
 
                     if (!rollInfo[0]) {
-                        socket.emit('game-event', `You rolled ${rollInfo[2]}. Your position is ${rollInfo[3]}.`, messages["success"]);
                         diceRolled = true;
                     }
                     else if (numDoubles < 3) {
@@ -201,10 +206,10 @@ io.on('connection', (socket) => {
                         diceRolled = true;
                     }
                     // if the player landed a purchasable space, see if they want to buy it
-                    if (space instanceof Property || space instanceof Railroad || space instanceof Utility && space.owner === null) {
+                    if (space instanceof Property || space instanceof Railroad || space instanceof Utility && !space.isOwned()) {
                         console.log("Space is a purchaseable");
                         socket.emit('land-purchase', space.name, space.price);
-                    } 
+                    }
                 } 
                 // If player already rolled this turn
                 else {
@@ -290,12 +295,21 @@ io.on('connection', (socket) => {
             auction_info.numPasses = 0;
             //go to the next player in the order
             auction_info.bidOrderInd+=1;
-            if(auction_info.bidOrderInd >= auction_info.bidOrder.length) {
+            console.log("Bid order:", auction_info.bidOrder)
+            console.log("Bid order index:", auction_info.bidOrderInd)
+            if(auction_info.bidOrderInd > auction_info.bidOrder.length-1) {
                 auction_info.bidOrderInd = 0;
             }
             //query the user for their bid or pass
-            console.log("Sending bid request to", backendPlayers[auction_info.bidOrder[auction_info.bidOrderInd]].name);
-            io.to(auction_info.bidOrder[auction_info.bidOrderInd]).emit('your-bid', auction_info);
+            if(auction_info.currentBidderID !== auction_info.bidOrder[auction_info.bidOrderInd]) {
+                console.log("Sending bid request to", backEndPlayers[auction_info.bidOrder[auction_info.bidOrderInd]].name);
+                io.to(auction_info.bidOrder[auction_info.bidOrderInd]).emit('your-bid', auction_info);
+            } else {
+                console.log("Auction ended! Everyone passed after someone bid.")
+                // End the auction
+                io.emit('auction-ended', auction_info);
+                setOwner(auction_info.spaceForAuction, auction_info.currentBidderID);
+            }
         });
 
         socket.on('bid-pass', (auction_info) => {
@@ -314,7 +328,7 @@ io.on('connection', (socket) => {
                 io.emit('auction-ended', auction_info);
             }
             else {
-                console.log("Sending bid request to", backendPlayers[auction_info.bidOrder[auction_info.bidOrderInd]].name)
+                console.log("Sending bid request to", backEndPlayers[auction_info.bidOrder[auction_info.bidOrderInd]].name)
                 // Set the next bidder
                 auction_info.bidOrderInd += 1;
                 if (auction_info.bidOrderInd >= auction_info.bidOrder.length) {
@@ -339,20 +353,17 @@ setInterval(() => {
     }
 }, 1000);
 
-//listen on the port
-
-server.listen(port, () => {
-    console.log(`Server listening on port ${port}`)
-});
-
-//THIS FUNCTION IS WRONGGGGGGGGGGGGGGGGGGGGGGGG (bidOrder and bidOrderInd need to be changed)
+// ########################### Auction Functions ########################### //
 function startAuction(space) {
     // Start the auction
     console.log("Starting auction...");
     io.emit('auction-started', space.name, space.price);
     // Set the bid order (everyone except the person who started the auction)
     turnOrderCopy = [...turnOrder];
-    bidOrder = turnOrderCopy.slice(currentPlayerTurn+1, turnOrder.length).concat(0, currentPlayerTurn);
+    console.log("Turn order copy:", turnOrderCopy);
+    bidOrder = turnOrderCopy.slice(currentPlayerTurn+1, turnOrder.length).concat(turnOrderCopy.slice(0, currentPlayerTurn));
+
+    console.log("BID ORDER:", bidOrder)
     // Set the auction info object
     let auction_info = {
         spaceForAuction: space.name,
@@ -371,13 +382,23 @@ function startAuction(space) {
 }
 
 function setOwner(spaceName, ownerID) {
-    space = getSpaceByName(spaceName);
+    space = board.getSpaceByName(spaceName);
     space.owner = backEndPlayers[ownerID];
     return;
 }
 
 
+
+
+//listen on the port
+
+server.listen(port, () => {
+    console.log(`Server listening on port ${port}`)
+});
+
+
+
+
 /* BEGIN MONOPOLY GAMEFLOW */
-// board object with all board spaces and a ton of data
-const board = new Board(backEndPlayers);
+var board = null
 var currentBid = 0;

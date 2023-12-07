@@ -21,6 +21,12 @@ class player {
         }
         return;
     }
+    checkMoney() {
+        if(this.money <= 0) {
+            bankrupt();
+        }
+        return;
+    }
     bankrupt() {
         //method to handle bankrupcy
     }
@@ -82,9 +88,9 @@ class player {
         console.log(`Player position: ${this.currentPosition}`);
 
         // Land on that space and do appropriate action
-        board.landOn(this, this.currentPosition, diceTotal);
+        const msg = board.landOn(this, this.currentPosition, diceTotal);
 
-        return [rolledDoubles, numDoubles, diceTotal, this.currentPosition] ;
+        return [rolledDoubles, numDoubles, diceTotal, this.currentPosition, msg] ;
     }
     goToJail() {
         this.inJail = true;

@@ -1,3 +1,4 @@
+const Player = require('./player.js');
 class card {
     constructor({description, event, position = 0, amount = 0, board, isStreet = false}) {
         this.description = description;
@@ -36,9 +37,9 @@ class card {
             }
 
             //if bridge is owned, pay ten times amount rolled on dice
-            num1 = player.rollDice();
-            num2 = player.rollDice();
-            diceTotal = num1 + num2;
+            const num1 = player.rollDice();
+            const num2 = player.rollDice();
+            const diceTotal = num1 + num2;
             player.teleport(this.position, this.board, diceTotal);
         }
 
@@ -78,6 +79,7 @@ class card {
     }
     
     repair(player) {
+        var tot = 0;
         if(this.isStreet) {
             tot = (player.housesOwned * 45) + (player.hotelsOwned * 115);
         }
@@ -88,11 +90,17 @@ class card {
     }
 
     moneyEveryone(player) {
-        allPlayers = this.board.players;
+        const allPlayers = this.board.players;
+        console.log("Attempting to pay everyone, allPlayers:");
+        console.log(allPlayers);
         for(const id in allPlayers) {
             if(allPlayers[id] !== player) {
-                allPlayers[id].addMoney(-1*this.amount);
-                player.addMoney(this.amount);
+                allPlayers[id].money += -1*this.amount;
+                allPlayers[id].checkMoney();
+                player.money += this.amount;
+                player.checkMoney();
+            } else {
+                console.log("Player is not instance of Player or this is the player getting paid/paying")
             }
         }
     }

@@ -263,7 +263,7 @@ class card_deck {
         }
         const card = this.deck.pop();
         card.performAction(player);
-        return;
+        return `${this.name} card: ${card.description}`;
     }
 }
 
