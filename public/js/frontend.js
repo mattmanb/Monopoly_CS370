@@ -9,8 +9,11 @@ var inLobby = true;
 const frontEndPlayers = {}; //dictionary of players who connect (socket.id is the key for each player)
 var frontEndPieces = [];
 
-/*** Start socket.io ***/
-socket.on('updateLobby', (backEndPlayers) => {
+//dictionary of colors for different kinds of messages
+const messages = {"info": "#3498db", "warning": "#FEBE10", "error": "#fd5c63", "success": "#32de84"};
+
+// ########################### Socket.io ########################### //
+socket.on('updateData', (backEndPlayers) => {
     if(inLobby) {
         socket.emit('fe-wants-pieces-updated'); //send the request to update fe pieces
     }
@@ -21,7 +24,7 @@ socket.on('updateLobby', (backEndPlayers) => {
                 name: backEndPlayer.name,
                 piece: backEndPlayer.piece,
                 money: backEndPlayer.money,
-                position:backEndPlayer.position,
+                currentPosition:backEndPlayer.currentPosition,
                 inJail:backEndPlayer.inJail,
                 outOfJailCards:backEndPlayer.outOfJailCards,
                 turnsInJail: backEndPlayer.turnsInJail,
@@ -30,14 +33,17 @@ socket.on('updateLobby', (backEndPlayers) => {
         } else { //player exists on the front end and back end
 
             //Update the player's info
-            frontEndPlayers[id].name = backEndPlayer.name,
-            frontEndPlayers[id].piece = backEndPlayer.piece,
-            frontEndPlayers[id].money = backEndPlayer.money,
-            frontEndPlayers[id].position = backEndPlayer.position,
-            frontEndPlayers[id].inJail = backEndPlayer.inJail,
-            frontEndPlayers[id].outOfJailCards = backEndPlayer.outOfJailCards,
-            frontEndPlayers[id].turnsInJail = backEndPlayer.turnsInJail,
-            frontEndPlayers[id].playerNumber = backEndPlayer.playerNumber 
+            frontEndPlayers[id].name = backEndPlayer.name;
+            frontEndPlayers[id].piece = backEndPlayer.piece;
+            frontEndPlayers[id].money = backEndPlayer.money;
+            frontEndPlayers[id].currentPosition = backEndPlayer.currentPosition;
+            frontEndPlayers[id].inJail = backEndPlayer.inJail;
+            frontEndPlayers[id].outOfJailCards = backEndPlayer.outOfJailCards;
+            frontEndPlayers[id].turnsInJail = backEndPlayer.turnsInJail;
+            frontEndPlayers[id].playerNumber = backEndPlayer.playerNumber;
+            frontEndPlayers[id].railroadsOwned = backEndPlayer.railroadsOwned;
+            frontEndPlayers[id].houses = backEndPlayer.houses;
+            frontEndPlayers[id].motels = backEndPlayer.motels;
 
             if(inLobby) {
                 if(id === socket.id) { //if this is the player connected:
@@ -45,7 +51,11 @@ socket.on('updateLobby', (backEndPlayers) => {
                 } else { //if this isn't the player's front end (its another player's)
                     updateOtherPlayer(id);
                 }
-            }       }
+            } else {
+                // When in game, this will update the players' stats display
+                updatePlayerData();
+            }
+        }
         for(const id in frontEndPlayers) { //Ensure no players exist on the front end that don't on the backend
             if(!backEndPlayers[id]) {
                 if(inLobby) {
@@ -58,13 +68,38 @@ socket.on('updateLobby', (backEndPlayers) => {
     //console.log(frontEndPlayers);
 });
 
+// updates the location of pieces on the board
+socket.on('update-pieces', (backEndPlayers) => {
+    for(const id in backEndPlayers) {
+        frontEndPlayers[id] = backEndPlayers[id];
+        const pieceMapLocation = $(`#space${backEndPlayers[id].currentPosition} .${backEndPlayers[id].playerNumber}`);
+        if(pieceMapLocation.find("img").length === 0) {
+            const piece = $(`<img>`); //create a new image element
+            piece.attr({
+                "z-index": "10",
+                "src": `../img/${backEndPlayers[id].piece}.png`,
+                "alt": `${backEndPlayers[id].piece} piece`,
+                "width": "20px",
+                "height": "20px"
+            });
+            pieceMapLocation.append(piece);
+        }
+        
+    }
+});
+
+socket.on('remove-piece', (id) => {
+    const pieceMapLocation = $(`#space${frontEndPlayers[id].currentPosition} .${frontEndPlayers[id].playerNumber}`);
+    pieceMapLocation.empty();
+});
+
 // updates the front end pieces 
 socket.on('pieces-list', (backEndPieces) => {
     frontEndPieces = [...backEndPieces];
 });
 
 socket.on('piece-taken', (piece) => {
-    alert(`The ${piece} piece is taken! Please try again.`)
+    gameEvent(`The ${piece} piece is taken! Please try again.`, "red");
 });
 
 socket.on('update-connected-players', (unconnected_players) => {
@@ -74,31 +109,19 @@ socket.on('update-connected-players', (unconnected_players) => {
     }
 });
 
-socket.on('player-alert', (msg) => {
-    alert(msg);
-});
-
 //IMPORTANT SOCKET IO HANDLER: this socket event loads the actual page we want
 socket.on('update-content', (content) => {
     document.getElementById('app').innerHTML = content;
-    console.log("Attempting to update app");
+    console.log("Attempting to update page content...");
 });
 
-// End socket.io ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// START SPA dynamic loading  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ########################### SPA loading ########################### //
 
 
 $('#app').on('click', '#startGameButton', () => {
     startGame();
 });
-
-$('#app').on('click', '#back_to_home', () => {
-    inLobby = true;
-    socket.emit('load-page', ("lobby"));
-})
 
 $('#app').on('click', '#roll_dice', () => {
     console.log("Roll dice button pressed.");
@@ -107,6 +130,7 @@ $('#app').on('click', '#roll_dice', () => {
 
 $('#app').on('click', '#end_turn', () => {
     console.log("End turn button pressed.");
+    $(`#${socket.id}`).css("background-color", "#f0f0f0");
     socket.emit('end-turn') ;
 })
 
@@ -115,12 +139,11 @@ function startGame() {
     // if(frontEndPlayers[socket.id].playerNumber == host && validateStart() && Object.keys(frontEndPlayers).length > 1) {
     //     socket.emit('start-game'); }
     if(frontEndPlayers[socket.id].playerNumber != host) {
-        alert(`Player ${host} needs to start the game.`);
+        gameEvent(`Player ${host} needs to start the game.`, messages["error"]);
     } else if(Object.keys(frontEndPlayers).length <= 1) {
-        alert("There must be at least 2 players to begin.");
+        gameEvent("There must be at least 2 players to begin.", messages["error"]);
     } else if(!validateStart()) {
-        console.log(host, frontEndPlayers[socket.id].playerNumber)
-        alert("All players must enter a name and choose their piece!");
+        gameEvent("All players must enter a name and choose their piece!", messages["error"]);
     } else {
         socket.emit('load-page', ("board"));
         socket.emit('start-game');
@@ -130,7 +153,6 @@ function startGame() {
 
 function validateStart() { //make sure every player has chosen a piece and name
     for(const id in frontEndPlayers) {
-        console.log(id, frontEndPlayers[id]);
         if(!frontEndPlayers[id].name || !frontEndPlayers[id].piece) {
             return false;
         }
@@ -138,11 +160,65 @@ function validateStart() { //make sure every player has chosen a piece and name
     return true;
 }
 
-// END SPA dynamic loading //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+socket.on('show-player-data', (turnOrder) => {
+    //this is a failsafe if inLobby isnt already false (it should be here)
+    inLobby = false;
+    showPlayerStats(turnOrder);
+})
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function showPlayerStats(turnOrder) {
+    console.log("In showPlayerStats!")
+    //HTML for player stats (This shows one player)
+    // <div class="player-info">
+    //     <h3 id="player-name">Player Name</h3>
+    //     <p id="player-money">Money: $1000</p>
+    //     <p id="player-position">Position: Boardwalk</p>
+    //     <p id="player-in-jail">In Jail: No</p>
+    //     <p id="player-jail-cards">Get Out of Jail Cards: 2</p>
+    // </div>
+    const $player_info_container = $('#player-info-container');
+    for(var id of turnOrder) {
+        const player_info = `<div class="player-info" id="${id}">
+                                <h3>${frontEndPlayers[id].name}</h3>
+                                <p>Money: $${frontEndPlayers[id].money}</p>
+                                <p>Position: ${frontEndPlayers[id].currentPosition}</p>
+                                <p>In Jail: ${frontEndPlayers[id].inJail}</p>
+                                <p>Get Out of Jail Cards: ${frontEndPlayers[id].outOfJailCards}</p>
+                            </div>`;
+        $player_info_container.append(player_info);
+    }
+    $player_info_container.css("visibility", "visible");
+}
 
-//Lobby functions ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function updatePlayerData() {
+    for(const id in frontEndPlayers) {
+        const player_info_box = $(`#${id}`);
+        player_info_box.html(
+            `<h3>${frontEndPlayers[id].name}</h3>
+            <p>Money: $${frontEndPlayers[id].money}</p>
+            <p>Position: ${frontEndPlayers[id].currentPosition}</p>
+            <p>In Jail: ${frontEndPlayers[id].inJail}</p>
+            <p>Get Out of Jail Cards: ${frontEndPlayers[id].outOfJailCards}</p>`
+        )
+        if(id === socket.id) {
+            $(`#${id} h3, #${id} p`).css("color", "red");
+        }
+    }
+}
+
+socket.on('turn-indicator', (playerID) => {
+    console.log("In turn-indicator", playerID);
+    for(const id in frontEndPlayers) {
+        if(id === playerID) {
+            $(`#${id}`).css("background-color", "lime");
+        } else {
+            $(`#${id}`).css("background-color", "#f0f0f0");
+        }
+    }
+    $(`#${playerID}`).backgroundColor = "lime";
+});
+
+// ########################### Lobby Functions ########################### //
 function createUserForm(id) {
     const playerNumber = (frontEndPlayers[id].playerNumber).toString()
     const $playerContainer = $("#" + playerNumber);
@@ -209,13 +285,35 @@ function getLowestPlayerNumber() { //basically choose who can start the game
     return min;
 }
 
-//END lobby functions ***************************************************************************************************************************************************************************************************************************************
-//////////////////////////////////////////////////////////////////////////////////////////
-// CHAT
+// ########################### Chat ########################### //
 $(document).ready(() => {
     makeDraggable("#chat", "#dragHandle");
     makeResizeable("#chat", "#resizeHandle");
+
+    //Make player stats draggable
 });
+
+socket.on('game-event', (msg, color) => {
+    const gameEventChat = $("#gameEventChat");
+    const newMessage = $("<div>").text(`${msg}`);
+    newMessage.css("color", color);
+    gameEventChat.append(newMessage);
+
+    //Scroll to the bottom to see the latest messages
+    const parentElement = $("#eventContainer")[0]; // Get the DOM element, not the jQuery object
+    parentElement.scrollTop = parentElement.scrollHeight;
+});
+
+function gameEvent(msg, color) {
+    const gameEventChat = $("#gameEventChat");
+    const newMessage = $("<div>").text(`${msg}`);
+    newMessage.css("color", color);
+    gameEventChat.append(newMessage);
+
+    //Scroll to the bottom to see the latest messages
+    const parentElement = $("#eventContainer")[0]; // Get the DOM element, not the jQuery object
+    parentElement.scrollTop = parentElement.scrollHeight;
+}
 
 function makeDraggable(containerSelector, handleSelector) {
     let isDragging = false;
@@ -273,7 +371,6 @@ $("#send-button").click((e) => {
     e.preventDefault();
     //get the msg from the input box
     const msg = $("#msg-input").val();
-    console.log("MESSAGE:", msg)
     //make sure an empty string isn't being sent
     if(msg.trim() === '') {
         socket.emit('send-message', null, "Enter a message before sending.");
@@ -297,7 +394,8 @@ socket.on('msg-incoming', (msg) => {
     messageContainer.append(newMessage);
 
     //Scroll to the bottom to show the latest messages
-    messageContainer.scrollTop(messageContainer[0].scrollHeight);
+    const parentElement = $('#chatContainer')[0]; // Get the DOM element, not the jQuery object
+    parentElement.scrollTop = parentElement.scrollHeight;
 });
 
 /*** Socketio for the game itself ***/
@@ -306,13 +404,106 @@ socket.on('get-board-data', (BE_board) => {
     FE_board = BE_board;
 })
 
+// ########################### Property/Railroad/Utility Handling ########################### //
+
 socket.on('land-purchase', (propertyName, propertyPrice) => {
     console.log(`Would you like to purchase ${propertyName} for ${propertyPrice}?`);
-    const msg = `Would you like to purchase ${propertyName} for ${propertyPrice}?`;
-    const response = confirm(msg);
-    socket.emit('purchase-decision', propertyName, response);
+    // const msg = `Would you like to purchase ${propertyName} for ${propertyPrice}?`;
+    // const response = confirm(msg);
+    const modalContent = createPurchaseModal(propertyName, propertyPrice);
+    $('#modal').append(modalContent);
+    $('#modal').css("visibility", "visible");
+    $('#purchase-yes').on('click', () => {
+        socket.emit('purchase-decision', propertyName, true);
+        $('#modal').empty();
+        $('#modal').attr("visibility", "invisible");
+    });
+    $('#purchase-no').on('click', () => {
+        socket.emit('purchase-decision', propertyName, false);
+        $('#modal').empty();
+        $('#modal').attr("visibility", "invisible");
+    });
+});
+function createPurchaseModal(spaceName, propertyPrice) {
+    const modalContent = $('<div>').addClass('modal-content');
+    const message = $('<p>').text(`Would you like to purchase ${spaceName} for ${propertyPrice}?`);
+    const yesButton = $('<button>').text('Buy').attr('id', 'purchase-yes');
+    const noButton = $('<button>').text('Pass').attr('id', 'purchase-no');
+
+    modalContent.append(message, yesButton, noButton);
+
+    return modalContent;
+}
+// ########################### Auction Handling ########################### //
+
+socket.on('auction-started', (spaceName, spacePrice) => {
+    gameEvent(`Auction for ${spaceName} has started!\nStarting bid is ${spacePrice}`, messages["info"]);
+    console.log(`Auction for ${spaceName} has started!\nStarting bid is ${spacePrice}`);
 });
 
-socket.on('start-auction', (property) => {
-    alert(`Auction for ${property.name} has started!`);
+socket.on('your-bid', (auction_info) => {
+    const modalContent = createAuctionModal(auction_info.propertyName, auction_info.currentBid, auction_info.currentBidderName);
+    $('#modal').append(modalContent);
+    $('#modal').css("visibility", "visible");
+    $('#passButton').on('click', () => {
+        console.log('passing');
+        socket.emit('bid-pass', auction_info);
+        console.log("Emptying and hiding modal");
+        $('#modal').empty();
+        $('#modal').css("visibility", "invisible");
+    });
+    $('#submitBid').on('click', () => {
+        const bid = parseInt($('#bidBox').val());
+        console.log("Bid vs currentBid", bid, auction_info.currentBid)
+        console.log("auction_info.currentBidderID === null", auction_info.currentBidderID === null)
+        if (bid < auction_info.currentBid && auction_info.currentBidderID === null) {
+            console.log('passing, starting bid too low');
+            socket.emit('bid-pass', auction_info);
+        } else if(bid <= auction_info.currentBid && auction_info.currentBidderID !== null) {
+            console.log("auction_info.currentBidderID !== null:", auction_info.currentBidderID !== null)
+            console.log('passing, bid lower than current bid', auction_info.currentBid);
+            socket.emit('bid-pass', auction_info);
+        } else if(bid === NaN) {
+            console.log('passing, entered nothing');
+            socket.emit('bid-pass', auction_info);
+        } else {
+            auction_info.currentBid = bid;
+            console.log('submitting bid');
+            socket.emit('bid', auction_info, bid);
+        }
+        console.log("Emptying and hiding modal");
+        $('#modal').empty();
+        $('#modal').css("visibility", "invisible");
+    });
+});
+
+function createAuctionModal(spaceName, currentBid, currentBidder) {
+    const modalContent = $('<div>').addClass('modal-content');
+    let message;
+    if(!currentBidder) {
+        message = $('<p>').text(`Would you like to bid on ${spaceName}?\nStarting bid is ${currentBid}.`);
+    } else {
+        message = $('<p>').text(`Would you like to bid on ${spaceName}?\nCurrent bid is ${currentBid} by ${currentBidder}.`);
+    }
+    const bidBox = $('<input>').attr({
+        'id': 'bidBox',
+        'type': 'number',
+        'placeholder': 'Enter bid here'
+    });
+    const submitBid = $('<button>').text('Bid').attr('id', 'submitBid');
+    const passButton = $('<button>').text('Pass').attr('id', 'passButton');
+
+    modalContent.append(message, bidBox, submitBid, passButton);
+
+    return modalContent;
+}
+
+socket.on('auction-ended', (auction_info) => {
+    if(auction_info.currentBidderID === null) {
+        console.log(`No one bid on ${auction_info.spaceForAuction}.\n Game continues...`)
+        gameEvent(`No one bid on ${auction_info.spaceForAuction}.\n Game continues...`, messages["info"]);
+    } else {
+        console.log(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`);
+        gameEvent(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`, messages["info"]);
+    }
 });

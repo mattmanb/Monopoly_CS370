@@ -4,26 +4,44 @@
   <head>
     <title>MONOPOLYTECH</title>
     <link rel="stylesheet" href="styles.css" />
+    <!-- socket.io import -->
     <script src="/socket.io/socket.io.js"></script>
+    <!-- jQuery import -->
     <script
       src="https://code.jquery.com/jquery-3.7.1.min.js"
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous">
     </script>
+    <!-- boostrap import -->
+    <!-- front-end code import -->
     <script type="module" src="./js/frontend.js"></script>
   </head>
 
   <body>
     <h1>MONOPOLYTECHNIC</h1>
     <div id="chat" class="draggable resizable">
-      <div id="dragHandle" class="drag-handle">Drag me</div>
-      <div id="resizeHandle" class="resize-handle">Resize Chat</div>
-      <div id="chat-messages">
+      <div id="dragHandle"><img src="./img/drag.png" width="20px"></div>
+      <div id="resizeHandle"><img src="./img/resize.png" width="20px"></div>
+      <div id="chatContainer">
+        
+        <div id="chat-messages">
+
+        </div>
       </div>
-      <form id="chat-form" method="post">
-          <input type="text" id="msg-input" name="message" placeholder="Enter a message..." maxlength="500" autocomplete="off">
-          <button type="submit" id="send-button">Send</button>
-      </form>
+      <div id="chatbox">
+        <form id="chat-form" method="post">
+          <input type="text" id="msg-input" class="form-control" name="message" placeholder="Enter a message..." maxlength="500" autocomplete="off">
+          <button type="button" id="send-button" class="btn btn-primary">Send</button>
+        </form>
+      </div>
+      <div id="eventContainer">
+        <div id="gameEventChat">
+          <p>Game Events here</p>
+        </div>
+      </div>
+    </div>
+    <div id="player-info-container">
+
     </div>
     <div id="app"> <!--SPA element: this div will contain the content for the page, loaded in using javascript-->
       

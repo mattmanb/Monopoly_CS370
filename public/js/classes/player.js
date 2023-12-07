@@ -9,6 +9,9 @@ class player {
         this.outOfJailCards = outOfJailCards;
         this.turnsInJail = turnsInJail;
         this.playerNumber = playerNumber;
+        this.railroadsOwned = 0;
+        this.houses = 0;
+        this.motels = 0;
     }
 
     addMoney(money) {
@@ -18,17 +21,34 @@ class player {
         }
         return;
     }
+    checkMoney() {
+        if(this.money <= 0) {
+            bankrupt();
+        }
+        return;
+    }
     bankrupt() {
         //method to handle bankrupcy
     }
     movePlayer(numSpaces) {
+        let passedGo = false;
         this.currentPosition = this.currentPosition + numSpaces;
         if (this.currentPosition >= 40) {
             this.currentPosition = this.currentPosition - 40;
             this.money += 200;
+            passedGo = true;
             console.log("Pass GO, collect 200!");
         }
-        return;
+        return passedGo;
+    }
+    // this is for card stuff
+    teleport(pos, board, diceTotal) {
+        this.currentPosition = pos;
+        // if diceTotal is -1, the player is moving back 3 spaces (should not pass go)
+        if (pos < this.currentPosition && diceTotal !== -1) {
+            this.money += 200;
+        }
+        board.landOn(this, this.currentPosition, diceTotal);
     }
     setPosition(pos) {
         this.currentPosition = pos;
@@ -44,7 +64,7 @@ class player {
         else
             return false
     }
-    rollAndMove(numDoubles = 0, board, socket) { //set default numDoubles to 0 (if a number gets passed in the default gets overridden)
+    rollAndMove(numDoubles = 0, board) { //set default numDoubles to 0 (if a number gets passed in the default gets overridden)
         // Roll 2 dice
         const dice1 = this.rollDice()
         const dice2 = this.rollDice()
@@ -66,13 +86,17 @@ class player {
         // Add dice rolls and move player that many spaces
         var diceTotal = dice1 + dice2
         console.log(`${this.name} rolled ${diceTotal}`);
-        this.movePlayer(diceTotal);
+        const passedGo = this.movePlayer(diceTotal);
         console.log(`Player position: ${this.currentPosition}`);
 
         // Land on that space and do appropriate action
-        board.landOn(this, this.currentPosition, socket);
+        let msg = board.landOn(this, this.currentPosition, diceTotal);
 
-        return [rolledDoubles, numDoubles, diceTotal, this.currentPosition] ;
+        if(passedGo) {
+            msg += "\nPassed Go! Collect $200."
+        }
+
+        return [rolledDoubles, numDoubles, diceTotal, this.currentPosition, msg] ;
     }
     goToJail() {
         this.inJail = true;

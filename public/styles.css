@@ -486,13 +486,34 @@ h6 {
   border: 1px solid #ccc;
   background-color: #f9f9f9;
   padding:10px;
-  width:200px;
-  height:200px;
+  width:500px;
+  height:500px;
+  min-width: 300px;
+  min-height: 300px;
+  z-index: 1;
+  font-size: large;
+}
+
+#chatContainer {
+  height:30%;
   overflow-y: scroll;
-  overflow-x:hidden;
-  min-width: 100px;
-  min-height: 100px;
-  z-index: 100;
+}
+
+#chatbox {
+  height:20%;
+  margin-top: 5px;
+  margin-bottom:15px;
+}
+
+#eventContainer {
+  height:30%;
+  overflow-y: scroll;
+  border: 1px dotted blue;
+}
+
+#msg-input {
+  height:25px;
+  margin-bottom: 5px;
 }
 
 #dragHandle {
@@ -502,11 +523,12 @@ h6 {
   text-align: center;
 }
 
-.resize-handle {
-  height: 10px;
+#resizeHandle {
+  width:auto;
+  height: 25px;
   background-color: #3498db;
   position: absolute;
-  bottom: 0;
+  bottom: 10px;
   right: 0;
   cursor: nwse-resize;
 }
@@ -515,6 +537,28 @@ h6 {
 
 .draggable {
   user-select: none;
+}
+
+#modal {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border: 1px solid black;
+  padding: 10px;
+  z-index: 1;
+  visibility:hidden;
+}
+
+.modal-content {
+  text-align: center;
+}
+
+/* You might want to style buttons more */
+button {
+  margin: 5px;
 }
 
 .parent{
@@ -635,4 +679,29 @@ h6 {
   border-color: black;
   display:grid;
   place-content: center;
+}
+
+#player-info-container {
+  visibility:hidden;
+  position:absolute;
+  left:20px;
+  top:20px;
+}
+
+.player-info {
+  border: 2px solid #333;
+  padding: 10px;
+  margin: 10px;
+  width: 300px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  font-size: large;
+}
+
+.player-info h3 {
+  margin-top: 0;
+}
+
+.player-info p {
+  margin: 5px 0;
 }
