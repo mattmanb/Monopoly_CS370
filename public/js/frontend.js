@@ -416,12 +416,14 @@ socket.on('land-purchase', (propertyName, propertyPrice) => {
     $('#purchase-yes').on('click', () => {
         socket.emit('purchase-decision', propertyName, true);
         $('#modal').empty();
-        $('#modal').attr("visibility", "invisible");
+        $('#modal').hide();
+        // $('#modal').attr("visibility", "invisible");
     });
     $('#purchase-no').on('click', () => {
         socket.emit('purchase-decision', propertyName, false);
         $('#modal').empty();
-        $('#modal').attr("visibility", "invisible");
+        $('#modal').hide();
+        // $('#modal').attr("visibility", "invisible");
     });
 });
 function createPurchaseModal(spaceName, propertyPrice) {
@@ -443,8 +445,9 @@ socket.on('auction-started', (spaceName, spacePrice) => {
 
 socket.on('your-bid', (auction_info) => {
     const modalContent = createAuctionModal(auction_info.propertyName, auction_info.currentBid, auction_info.currentBidderName);
+    $('#modal').empty();
     $('#modal').append(modalContent);
-    $('#modal').css("visibility", "visible");
+    $('#modal').show();
     $('#passButton').on('click', () => {
         console.log('passing');
         socket.emit('bid-pass', auction_info);
