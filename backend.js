@@ -75,7 +75,7 @@ io.on('connection', (socket) => {
         availablePlayers.splice(pNindex, 1);
 
         // send new player data to the front end
-        io.emit('updateLobby', backEndPlayers); //emit to the front end; a new player joined
+        io.emit('updateData', backEndPlayers); //emit to the front end; a new player joined
 
         //lobby logic
 
@@ -166,11 +166,14 @@ io.on('connection', (socket) => {
                 turnOrder[a] = turnOrder[b];
                 turnOrder[b] = temp;
             }
+            console.log("Emitting turn order");
+            io.emit('show-player-data', turnOrder);
+            io.emit('turn-indicator', turnOrder[currentPlayerTurn]);
 
             // Send alert to whoevers turn it is
             //Object.keys(backEndPlayers)[currentPlayerTurn]
             io.emit('game-event', `${backEndPlayers[turnOrder[currentPlayerTurn]].name}'s turn!`, messages["info"]);
-            console.log(turnOrder);
+            console.log("TURN ORDER:", turnOrder);
         });
 
         socket.on('roll-dice', () => {
@@ -250,6 +253,8 @@ io.on('connection', (socket) => {
             // Send alert to whoever's turn it is right now if turn changed
             if(turnChanged) {
                 io.emit('game-event', `${backEndPlayers[turnOrder[currentPlayerTurn]].name}'s turn!`, messages["info"]);
+                console.log("Turn changed to", turnOrder[currentPlayerTurn]);
+                io.emit('turn-indicator', turnOrder[currentPlayerTurn]);
             }
 
         });
@@ -346,12 +351,7 @@ io.on('connection', (socket) => {
     }
 });
 
-setInterval(() => {
-    io.emit('updateLobby', backEndPlayers)
-    if(!inLobby) {
-        io.emit('update-pieces', backEndPlayers);
-    }
-}, 1000);
+
 
 // ########################### Auction Functions ########################### //
 function startAuction(space) {
@@ -388,7 +388,12 @@ function setOwner(spaceName, ownerID) {
 }
 
 
-
+setInterval(() => {
+    io.emit('updateData', backEndPlayers)
+    if(!inLobby) {
+        io.emit('update-pieces', backEndPlayers);
+    }
+}, 1000);
 
 //listen on the port
 

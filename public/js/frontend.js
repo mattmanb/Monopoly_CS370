@@ -13,7 +13,7 @@ var frontEndPieces = [];
 const messages = {"info": "#3498db", "warning": "#FEBE10", "error": "#fd5c63", "success": "#32de84"};
 
 // ########################### Socket.io ########################### //
-socket.on('updateLobby', (backEndPlayers) => {
+socket.on('updateData', (backEndPlayers) => {
     if(inLobby) {
         socket.emit('fe-wants-pieces-updated'); //send the request to update fe pieces
     }
@@ -41,6 +41,9 @@ socket.on('updateLobby', (backEndPlayers) => {
             frontEndPlayers[id].outOfJailCards = backEndPlayer.outOfJailCards;
             frontEndPlayers[id].turnsInJail = backEndPlayer.turnsInJail;
             frontEndPlayers[id].playerNumber = backEndPlayer.playerNumber;
+            frontEndPlayers[id].railroadsOwned = backEndPlayer.railroadsOwned;
+            frontEndPlayers[id].houses = backEndPlayer.houses;
+            frontEndPlayers[id].motels = backEndPlayer.motels;
 
             if(inLobby) {
                 if(id === socket.id) { //if this is the player connected:
@@ -48,7 +51,11 @@ socket.on('updateLobby', (backEndPlayers) => {
                 } else { //if this isn't the player's front end (its another player's)
                     updateOtherPlayer(id);
                 }
-            }       }
+            } else {
+                // When in game, this will update the players' stats display
+                updatePlayerData();
+            }
+        }
         for(const id in frontEndPlayers) { //Ensure no players exist on the front end that don't on the backend
             if(!backEndPlayers[id]) {
                 if(inLobby) {
@@ -123,6 +130,7 @@ $('#app').on('click', '#roll_dice', () => {
 
 $('#app').on('click', '#end_turn', () => {
     console.log("End turn button pressed.");
+    $(`#${socket.id}`).css("background-color", "#f0f0f0");
     socket.emit('end-turn') ;
 })
 
@@ -135,7 +143,6 @@ function startGame() {
     } else if(Object.keys(frontEndPlayers).length <= 1) {
         gameEvent("There must be at least 2 players to begin.", messages["error"]);
     } else if(!validateStart()) {
-        console.log(host, frontEndPlayers[socket.id].playerNumber)
         gameEvent("All players must enter a name and choose their piece!", messages["error"]);
     } else {
         socket.emit('load-page', ("board"));
@@ -152,6 +159,64 @@ function validateStart() { //make sure every player has chosen a piece and name
     }
     return true;
 }
+
+socket.on('show-player-data', (turnOrder) => {
+    //this is a failsafe if inLobby isnt already false (it should be here)
+    inLobby = false;
+    showPlayerStats(turnOrder);
+})
+
+function showPlayerStats(turnOrder) {
+    console.log("In showPlayerStats!")
+    //HTML for player stats (This shows one player)
+    // <div class="player-info">
+    //     <h3 id="player-name">Player Name</h3>
+    //     <p id="player-money">Money: $1000</p>
+    //     <p id="player-position">Position: Boardwalk</p>
+    //     <p id="player-in-jail">In Jail: No</p>
+    //     <p id="player-jail-cards">Get Out of Jail Cards: 2</p>
+    // </div>
+    const $player_info_container = $('#player-info-container');
+    for(var id of turnOrder) {
+        const player_info = `<div class="player-info" id="${id}">
+                                <h3>${frontEndPlayers[id].name}</h3>
+                                <p>Money: $${frontEndPlayers[id].money}</p>
+                                <p>Position: ${frontEndPlayers[id].currentPosition}</p>
+                                <p>In Jail: ${frontEndPlayers[id].inJail}</p>
+                                <p>Get Out of Jail Cards: ${frontEndPlayers[id].outOfJailCards}</p>
+                            </div>`;
+        $player_info_container.append(player_info);
+    }
+    $player_info_container.css("visibility", "visible");
+}
+
+function updatePlayerData() {
+    for(const id in frontEndPlayers) {
+        const player_info_box = $(`#${id}`);
+        player_info_box.html(
+            `<h3>${frontEndPlayers[id].name}</h3>
+            <p>Money: $${frontEndPlayers[id].money}</p>
+            <p>Position: ${frontEndPlayers[id].currentPosition}</p>
+            <p>In Jail: ${frontEndPlayers[id].inJail}</p>
+            <p>Get Out of Jail Cards: ${frontEndPlayers[id].outOfJailCards}</p>`
+        )
+        if(id === socket.id) {
+            $(`#${id} h3, #${id} p`).css("color", "red");
+        }
+    }
+}
+
+socket.on('turn-indicator', (playerID) => {
+    console.log("In turn-indicator", playerID);
+    for(const id in frontEndPlayers) {
+        if(id === playerID) {
+            $(`#${id}`).css("background-color", "lime");
+        } else {
+            $(`#${id}`).css("background-color", "#f0f0f0");
+        }
+    }
+    $(`#${playerID}`).backgroundColor = "lime";
+});
 
 // ########################### Lobby Functions ########################### //
 function createUserForm(id) {
@@ -224,6 +289,8 @@ function getLowestPlayerNumber() { //basically choose who can start the game
 $(document).ready(() => {
     makeDraggable("#chat", "#dragHandle");
     makeResizeable("#chat", "#resizeHandle");
+
+    //Make player stats draggable
 });
 
 socket.on('game-event', (msg, color) => {

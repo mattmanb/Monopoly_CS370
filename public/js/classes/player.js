@@ -31,13 +31,15 @@ class player {
         //method to handle bankrupcy
     }
     movePlayer(numSpaces) {
+        let passedGo = false;
         this.currentPosition = this.currentPosition + numSpaces;
         if (this.currentPosition >= 40) {
             this.currentPosition = this.currentPosition - 40;
             this.money += 200;
+            passedGo = true;
             console.log("Pass GO, collect 200!");
         }
-        return;
+        return passedGo;
     }
     // this is for card stuff
     teleport(pos, board, diceTotal) {
@@ -84,11 +86,15 @@ class player {
         // Add dice rolls and move player that many spaces
         var diceTotal = dice1 + dice2
         console.log(`${this.name} rolled ${diceTotal}`);
-        this.movePlayer(diceTotal);
+        const passedGo = this.movePlayer(diceTotal);
         console.log(`Player position: ${this.currentPosition}`);
 
         // Land on that space and do appropriate action
-        const msg = board.landOn(this, this.currentPosition, diceTotal);
+        let msg = board.landOn(this, this.currentPosition, diceTotal);
+
+        if(passedGo) {
+            msg += "\nPassed Go! Collect $200."
+        }
 
         return [rolledDoubles, numDoubles, diceTotal, this.currentPosition, msg] ;
     }

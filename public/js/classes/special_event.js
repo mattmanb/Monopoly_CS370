@@ -1,7 +1,10 @@
 class special_event {
-    contructor(name, price) {
-        this.name=name;
-        this.price=price;
+    constructor(eventFunction) {
+        this.eventExecution = eventFunction;
+    }
+    executeEvent(player) {
+        const msg = this.eventExecution(player);
+        return msg;
     }
 }
 

@@ -96,9 +96,7 @@ class card {
         for(const id in allPlayers) {
             if(allPlayers[id] !== player) {
                 allPlayers[id].money += -1*this.amount;
-                allPlayers[id].checkMoney();
                 player.money += this.amount;
-                player.checkMoney();
             } else {
                 console.log("Player is not instance of Player or this is the player getting paid/paying")
             }
