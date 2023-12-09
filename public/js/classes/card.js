@@ -86,7 +86,8 @@ class card {
         else{
             tot = (player.housesOwned * 25) + (player.hotelsOwned * 100);
         }
-        player.addMoney(tot);
+        player.money -= tot;
+        player.checkMoney();
     }
 
     moneyEveryone(player) {
@@ -94,7 +95,7 @@ class card {
         console.log("Attempting to pay everyone, allPlayers:");
         console.log(allPlayers);
         for(const id in allPlayers) {
-            if(allPlayers[id] !== player) {
+            if(allPlayers[id].name !== player.name) {
                 allPlayers[id].money += -1*this.amount;
                 player.money += this.amount;
             } else {

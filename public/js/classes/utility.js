@@ -21,13 +21,14 @@ class utility {
             return;
         }
         let amountOwed = 0;
-        if(this.owner.utilities.length === 2) {
+        if(this.owner.utilitiesOwned === 2) {
             amountOwed = diceTotal * 10;
-        } else if(this.owner.utilities.length === 1) {
+        } else if(this.owner.utilitiesOwned === 1) {
             amountOwed = diceTotal * 4;
         }
-        player.addMoney(-1*amountOwed);
-        return;
+        player.money -= amountOwed;
+        player.checkMoney();
+        return amountOwed;
     }
 }
 module.exports = utility;

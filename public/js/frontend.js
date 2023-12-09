@@ -93,13 +93,34 @@ socket.on('remove-piece', (id) => {
     pieceMapLocation.empty();
 });
 
+socket.on('player-surrendered', (playerID) => {
+    //grey out the player's box in the playdata section
+    const player_info_box = $(`#${playerID}`);
+    $("#app").ready(() => {
+        player_info_box.css({"background-color": "black",
+                        "border": "1px solid grey",
+                        "color": "grey"});
+        //set the player's info to nothing
+        player_info_box.html(
+            `<h3>${frontEndPlayers[id].name}</h3>
+            <p>Money: $0</p>
+            <p>Position: -</p>
+            <p>In Jail: -</p>
+            <p>Get Out of Jail Cards: -</p>`
+        );
+    })
+    
+    //delete the player from the front end.
+    delete frontEndPlayers[playerID];
+});
+
 // updates the front end pieces 
 socket.on('pieces-list', (backEndPieces) => {
     frontEndPieces = [...backEndPieces];
 });
 
 socket.on('piece-taken', (piece) => {
-    gameEvent(`The ${piece} piece is taken! Please try again.`, "red");
+    gameEvent(`The ${piece} piece is taken! Please try again.`, messages["error"]);
 });
 
 socket.on('update-connected-players', (unconnected_players) => {
@@ -126,7 +147,12 @@ $('#app').on('click', '#startGameButton', () => {
 $('#app').on('click', '#roll_dice', () => {
     console.log("Roll dice button pressed.");
     socket.emit('roll-dice') ;
-})
+});
+
+$('#app').on('click', '#surrender', () => {
+    console.log("Surrender button pressed.");
+    confirmSurrender();
+});
 
 $('#app').on('click', '#end_turn', () => {
     console.log("End turn button pressed.");
@@ -201,7 +227,7 @@ function updatePlayerData() {
             <p>Get Out of Jail Cards: ${frontEndPlayers[id].outOfJailCards}</p>`
         )
         if(id === socket.id) {
-            $(`#${id} h3, #${id} p`).css("color", "red");
+            $(`#${id} h3, #${id} p`).css("color", "#34568B");
         }
     }
 }
@@ -239,8 +265,8 @@ function createUserForm(id) {
                 pieceSelect.append($("<option>").attr("value", value).text(value));
             });
 
-            const submitButton = $("<input>").attr("type", "submit").val("Submit");
-
+            const submitButton = $("<input>").attr({"type": "submit", "class":"submit-input"}).val("Submit");
+            //<input type="submit" value="Submit" class="submit-input">
             form.append(usernameLabel, usernameInput, pieceLabel, pieceSelect, submitButton);
 
             $playerContainer.append(form);
@@ -411,24 +437,26 @@ socket.on('land-purchase', (propertyName, propertyPrice) => {
     // const msg = `Would you like to purchase ${propertyName} for ${propertyPrice}?`;
     // const response = confirm(msg);
     const modalContent = createPurchaseModal(propertyName, propertyPrice);
+    $('#modal').empty();
     $('#modal').append(modalContent);
     $('#modal').css("visibility", "visible");
+    //$('#modal').show();
     $('#purchase-yes').on('click', () => {
         socket.emit('purchase-decision', propertyName, true);
         $('#modal').empty();
-        $('#modal').hide();
-        // $('#modal').attr("visibility", "invisible");
+        //$('#modal').hide();
+        $('#modal').css("visibility", "hidden");
     });
     $('#purchase-no').on('click', () => {
         socket.emit('purchase-decision', propertyName, false);
         $('#modal').empty();
-        $('#modal').hide();
-        // $('#modal').attr("visibility", "invisible");
+        //$('#modal').hide();
+        $('#modal').css("visibility", "hidden");
     });
 });
 function createPurchaseModal(spaceName, propertyPrice) {
     const modalContent = $('<div>').addClass('modal-content');
-    const message = $('<p>').text(`Would you like to purchase ${spaceName} for ${propertyPrice}?`);
+    const message = $('<p>').text(`Would you like to purchase ${spaceName} for $${propertyPrice}?`);
     const yesButton = $('<button>').text('Buy').attr('id', 'purchase-yes');
     const noButton = $('<button>').text('Pass').attr('id', 'purchase-no');
 
@@ -447,36 +475,44 @@ socket.on('your-bid', (auction_info) => {
     const modalContent = createAuctionModal(auction_info.propertyName, auction_info.currentBid, auction_info.currentBidderName);
     $('#modal').empty();
     $('#modal').append(modalContent);
-    $('#modal').show();
+    //$('#modal').show();
+    $('#modal').css("visibility", "visible");
     $('#passButton').on('click', () => {
         console.log('passing');
         socket.emit('bid-pass', auction_info);
         console.log("Emptying and hiding modal");
         $('#modal').empty();
-        $('#modal').css("visibility", "invisible");
+        //$('#modal').hide();
+        $('#modal').css("visibility", "hidden");
     });
     $('#submitBid').on('click', () => {
         const bid = parseInt($('#bidBox').val());
-        console.log("Bid vs currentBid", bid, auction_info.currentBid)
-        console.log("auction_info.currentBidderID === null", auction_info.currentBidderID === null)
+        // if the bid is less than the starting bid
         if (bid < auction_info.currentBid && auction_info.currentBidderID === null) {
             console.log('passing, starting bid too low');
             socket.emit('bid-pass', auction_info);
-        } else if(bid <= auction_info.currentBid && auction_info.currentBidderID !== null) {
+        } 
+        // if the bid is less than or equal the bid by someone else
+        else if(bid <= auction_info.currentBid && auction_info.currentBidderID !== null) {
             console.log("auction_info.currentBidderID !== null:", auction_info.currentBidderID !== null)
             console.log('passing, bid lower than current bid', auction_info.currentBid);
             socket.emit('bid-pass', auction_info);
-        } else if(bid === NaN) {
+        } 
+        // if the bid entered is nothing (empty string)
+        else if(bid === NaN) {
             console.log('passing, entered nothing');
             socket.emit('bid-pass', auction_info);
-        } else {
+        } 
+        // a valid bid was entered
+        else {
             auction_info.currentBid = bid;
             console.log('submitting bid');
             socket.emit('bid', auction_info, bid);
         }
         console.log("Emptying and hiding modal");
         $('#modal').empty();
-        $('#modal').css("visibility", "invisible");
+        //$('#modal').hide();
+        $('#modal').css("visibility", "hidden");
     });
 });
 
@@ -484,9 +520,9 @@ function createAuctionModal(spaceName, currentBid, currentBidder) {
     const modalContent = $('<div>').addClass('modal-content');
     let message;
     if(!currentBidder) {
-        message = $('<p>').text(`Would you like to bid on ${spaceName}?\nStarting bid is ${currentBid}.`);
+        message = $('<p>').text(`Would you like to bid on ${spaceName}?\nStarting bid is $${currentBid}.`);
     } else {
-        message = $('<p>').text(`Would you like to bid on ${spaceName}?\nCurrent bid is ${currentBid} by ${currentBidder}.`);
+        message = $('<p>').text(`Would you like to bid on ${spaceName}?\nCurrent bid is $${currentBid} by ${currentBidder}.`);
     }
     const bidBox = $('<input>').attr({
         'id': 'bidBox',
@@ -510,3 +546,72 @@ socket.on('auction-ended', (auction_info) => {
         gameEvent(`${auction_info.currentBidderName} won the auction for ${auction_info.spaceForAuction}!`, messages["info"]);
     }
 });
+
+// ########################### Surrendering ########################### //
+
+function confirmSurrender() {
+    const modalContent = createSurrenderModal();
+    $('#modal').empty();
+    $('#modal').append(modalContent);
+    //$('#modal').show();
+    $('#modal').css("visibility", "visible");
+    $('#surrender-yes').on('click', () => {
+        socket.emit('surrender');
+        $('#modal').empty();
+        //$('#modal').hide();
+        $('#modal').css("visibility", "hidden");
+    });
+    $('#surrender-no').on('click', () => {
+        $('#modal').empty();
+        //$('#modal').hide();
+        $('#modal').css("visibility", "hidden");
+    });
+}
+
+function createSurrenderModal() {
+    const modalContent = $('<div>').addClass('modal-content');
+    const message = $('<p>').text(`Are you sure you want to surrender?`);
+    const yesButton = $('<button>').text('Yes').attr('id', 'surrender-yes');
+    const noButton = $('<button>').text('No').attr('id', 'surrender-no');
+
+    modalContent.append(message, yesButton, noButton);
+
+    return modalContent;
+}
+
+socket.on('player-won', (playerID) => {
+    gameEvent(`${frontEndPlayers[playerID].name} won the game!`, "#6B5B95");
+    console.log(`${frontEndPlayers[playerID].name} won the game!`);
+    const victory = createVictoryModal(playerID);
+    $('#modal').empty();
+    $('#modal').append(victory);
+    $('#modal').css("visibility", "visible");
+});
+
+function createVictoryModal(playerID) {
+    const modalContent = $('<div>').addClass('modal-content');
+    const message = $('<p>').text(`${frontEndPlayers[playerID].name} won the game!`);
+    const okButton = $('<button>').text('Ok').attr('id', 'ok-button');
+
+    modalContent.append(message, okButton);
+
+    modalContent.css({
+        'background-color': '#3498db',  // Blue background color
+        'color': '#fff',                // White text color
+        'border-radius': '8px',         // Rounded corners
+        'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.3)',  // Shadow for depth
+        'padding': '20px',              // Padding for content
+    });
+
+    okButton.css({
+        'background-color': '#2ecc71',  // Green button color
+        'color': '#fff',                // White text color
+        'border': 'none',               // No border
+        'border-radius': '4px',         // Rounded corners
+        'cursor': 'pointer',            // Pointer cursor on hover
+        'font-size': '16px',            // Font size
+        'margin-top': '10px',           // Top margin for button
+    });
+
+    return modalContent;
+}

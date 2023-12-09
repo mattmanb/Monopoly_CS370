@@ -25,11 +25,20 @@ class property{ //color to be implemented in street.js
         if(this.owner !== player) {
             if(this.checkMonopoly()) {
                 //THIS NEEDS TO BE CHANGED
-                player.addMoney(this.rent[rentLevel] * -1 * 2); //if its a monopoly rent doubles
+                const rent = this.rent[this.rentLevel] * 2
+                player.money -= rent; //if its a monopoly rent doubles
+                player.checkMoney();
+                return rent;
             } else {
-                player.addMoney(this.rent[rentLevel] * -1); //subtracts the rent of this property from the player's total
+                const rent = this.rent[this.rentLevel]
+                player.money -= rent; //subtracts the rent of this property from the player's total
+                player.checkMoney();
+                return rent;
             }
-        } 
+        } else {
+            console.log("Welcome to your property!");
+            return 0;
+        }
     }
     checkMonopoly() {
         // uses isMonopoly method from the avenue class this property is apart of
