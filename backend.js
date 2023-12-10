@@ -51,7 +51,7 @@ var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
 
 var inLobby = true;
 
-const messages = {"info": "blue", "warning": "#FEBE10", "error": "red", "success": "#32de84"};
+const messages = {"info": "#8dc6ff", "warning": "#FEBE10", "error": "red", "success": "#32de84", "surrender": "#955251"};
 
 // Vars for checking who's turn it is
 var turnOrder = [];
@@ -186,11 +186,12 @@ io.on('connection', (socket) => {
                     io.emit('remove-piece', socket.id);
                     // Rolls dice and stores info in array (bool rolledDoubles, int numDoubles, int diceTotal, int currentPosition)
                     rollInfo = backEndPlayers[socket.id].rollAndMove(0, board);
+                    console.log("Roll info:", rollInfo);
                     io.emit('update-pieces', backEndPlayers);
                     io.emit('game-event', (backEndPlayers[socket.id].name + " rolled " + rollInfo[2] + " and landed on " + board.spaces[rollInfo[3]].name + "."), messages["info"]);
                     space = board.spaces[rollInfo[3]];
                     console.log("Possible message:", rollInfo[4]);
-                    if(rollInfo[4]) {
+                    if(rollInfo[4].length !== 0) {
                         io.emit('game-event', rollInfo[4], messages["info"]);
                     }
 
@@ -209,9 +210,20 @@ io.on('connection', (socket) => {
                         diceRolled = true;
                     }
                     // if the player landed a purchasable space, see if they want to buy it
-                    if (space instanceof Property || space instanceof Railroad || space instanceof Utility && !space.isOwned()) {
-                        console.log("Space is a purchaseable");
-                        socket.emit('land-purchase', space.name, space.price);
+                    if (space instanceof Property || space instanceof Railroad || space instanceof Utility) {
+                        if(space.owner instanceof Player && space.owner !== backEndPlayers[socket.id]) {
+                            console.log("Space is owned!");
+                            if(space instanceof Utility) {
+                                const rent = space.payRent(backEndPlayers[socket.id], rollInfo[2]);
+                                io.emit('game-event', `${backEndPlayers[socket.id].name} is paying ${rent} to ${space.owner} for landing on their property ${space.name}`, messages["error"]);
+                            } else {
+                                const rent = space.payRent(backEndPlayers[socket.id]);
+                                io.emit('game-event', `${backEndPlayers[socket.id].name} is paying ${rent} to ${space.owner} for landing on their property ${space.name}`, messages["error"]);
+                            }
+                        } else {
+                            console.log("Space is a purchaseable");
+                            socket.emit('land-purchase', space.name, space.price);
+                        }
                     }
                 } 
                 // If player already rolled this turn
@@ -265,6 +277,7 @@ io.on('connection', (socket) => {
             //get the actual object
             space = board.getSpaceByName(spaceName);
             console.log("Fetched space from the name", space);
+
             //if the response to buying this property/railroad/utility is YES (true)
             if(response) {
                 //set the space's owner to this socket
@@ -278,6 +291,9 @@ io.on('connection', (socket) => {
                 if(space instanceof Railroad) {
                     //we must keep track of number of railroads owned to calculate rent
                     backEndPlayers[socket.id].railroadsOwned++;
+                } else if(space instanceof Utility) {
+                    //we must keep track of number of utilities owned to calculate rent
+                    backEndPlayers[socket.id].utilitiesOwned++;
                 }
             } else {
                 io.emit('game-event', `${backEndPlayers[socket.id].name} has declined to purchase ${space.name}.`, messages["info"]);
@@ -342,6 +358,32 @@ io.on('connection', (socket) => {
                 // Send the next bid to the next bidder
                 io.to(auction_info.bidOrder[auction_info.bidOrderInd]).emit('your-bid', auction_info);
             }
+        });
+
+        socket.on('surrender', () => {
+            console.log(`${backEndPlayers[socket.id].name} has surrendered!`);
+            io.emit('game-event', `${backEndPlayers[socket.id].name} has surrendered!`, messages["surrender"]);
+            // Remove the player from the turn order
+            turnOrder.splice(turnOrder.indexOf(socket.id), 1);
+            // Remove the player from the board
+            io.emit('remove-piece', socket.id);
+            // Remove the player from the front end
+            io.emit('player-surrendered', socket.id);
+            // Remove the player from the back end
+            delete backEndPlayers[socket.id];
+            if(Object.keys(backEndPlayers).length === 1) {
+                io.emit('player-won', Object.keys(backEndPlayers)[0]);
+                return;
+            }
+            // Check if the player who surrendered was the last player in the turn order
+            if (currentPlayerTurn >= turnOrder.length) {
+                currentPlayerTurn = 0;
+            }
+            // Send alert to whoevers turn it is
+            io.emit('game-event', `${backEndPlayers[turnOrder[currentPlayerTurn]].name}'s turn!`, messages["info"]);
+            console.log("TURN ORDER:", turnOrder);
+            io.emit('turn-indicator', turnOrder[currentPlayerTurn]);
+
         });
 
         console.log(backEndPlayers);

@@ -322,10 +322,15 @@ class board {
         });
     }
     landOn(player, space_number, diceTotal) {
+        /* 
+        landOn returns a string ALWAYS - this is a way to get information 
+        from inside of the class methods and emit that info to the front 
+        end; if there is nothing to say then we return an empty string.
+        */
         let space = this.spaces[space_number];
         if(space instanceof Property) {
             if(space.isOwned()) { //if the property is owned, make the player who landed here pay rent
-                space.payRent(player);
+                console.log(`Property is owned, paying ${space.rent[space.rentLevel]}`);
             } else {
                 console.log("Property is not owned");
             }
@@ -345,7 +350,7 @@ class board {
             } else {
                 console.log("Railroad is not owned");
             }
-            return;
+            return "";
         }
         else if(space instanceof Utility) {
             if(space.isOwned()) {
@@ -353,11 +358,9 @@ class board {
             } else {
                 console.log("Utility is not owned");
             }
-            return;
+            return "";
         }
-        else {
-            // the only other case is nothing happens, in which a message will be displayed... thats it
-        }
+        return "";
     }
     isMonopoly(space_ind) {
         if(!(board[space_ind] instanceof Property)) {
