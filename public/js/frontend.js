@@ -10,7 +10,7 @@ const frontEndPlayers = {}; //dictionary of players who connect (socket.id is th
 var frontEndPieces = [];
 
 //dictionary of colors for different kinds of messages
-const messages = {"info": "#3498db", "warning": "#FEBE10", "error": "#fd5c63", "success": "#32de84"};
+const messages = {"info": "#8dc6ff", "warning": "#FEBE10", "error": "#fd5c63", "success": "#32de84"};
 
 // ########################### Socket.io ########################### //
 socket.on('updateData', (backEndPlayers) => {
@@ -227,7 +227,7 @@ function updatePlayerData() {
             <p>Get Out of Jail Cards: ${frontEndPlayers[id].outOfJailCards}</p>`
         )
         if(id === socket.id) {
-            $(`#${id} h3, #${id} p`).css("color", "#34568B");
+            $(`#${id} h3, #${id} p`).css("color", "#7c73e6");
         }
     }
 }
@@ -320,10 +320,12 @@ $(document).ready(() => {
 });
 
 socket.on('game-event', (msg, color) => {
+    const br = $("<br>");
     const gameEventChat = $("#gameEventChat");
     const newMessage = $("<div>").text(`${msg}`);
     newMessage.css("color", color);
     gameEventChat.append(newMessage);
+    gameEventChat.append(br);
 
     //Scroll to the bottom to see the latest messages
     const parentElement = $("#eventContainer")[0]; // Get the DOM element, not the jQuery object

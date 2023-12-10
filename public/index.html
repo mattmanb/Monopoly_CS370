@@ -18,10 +18,11 @@
   </head>
 
   <body>
-    <h1>MONOPOLYTECHNIC</h1>
+    <h1 id="title">MONOPOLYTECHNIC</h1>
     <div id="chat" class="draggable resizable">
-      <div id="dragHandle"><img src="./img/drag.png" width="20px"></div>
-      <div id="resizeHandle"><img src="./img/resize.png" width="20px"></div>
+      <div id="dragHandle"><img src="./img/drag.png"></div>
+      <!--   <div id="resizeHandle"><img src="./img/resize.png"></div>   -->
+      <p class="chat_desc">Chat</p>
       <div id="chatContainer">
         
         <div id="chat-messages">
@@ -31,12 +32,12 @@
       <div id="chatbox">
         <form id="chat-form" method="post">
           <input type="text" id="msg-input" class="form-control" name="message" placeholder="Enter a message..." maxlength="500" autocomplete="off">
-          <button type="button" id="send-button" class="btn btn-primary">Send</button>
+          <button type="button" id="send-button">Send</button>
         </form>
       </div>
+      <p class="chat_desc">Game Events</p>
       <div id="eventContainer">
         <div id="gameEventChat">
-          <p>Game Events here</p>
         </div>
       </div>
     </div>

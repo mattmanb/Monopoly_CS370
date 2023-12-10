@@ -51,7 +51,7 @@ var availablePlayers = [1, 2, 3, 4, 5, 6, 7, 8];
 
 var inLobby = true;
 
-const messages = {"info": "blue", "warning": "#FEBE10", "error": "red", "success": "#32de84", "surrender": "#955251"};
+const messages = {"info": "#8dc6ff", "warning": "#FEBE10", "error": "red", "success": "#32de84", "surrender": "#955251"};
 
 // Vars for checking who's turn it is
 var turnOrder = [];

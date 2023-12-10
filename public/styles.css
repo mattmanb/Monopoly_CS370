@@ -2,6 +2,16 @@
   box-sizing: border-box;
 }
 
+html::before {
+  opacity: 0.5;
+}
+
+html {
+  background-image: url("./img/lobby1bg.jpg");
+  background-repeat: no-repeat;
+  background-size:cover;
+}
+
 body {
   margin: 0;
   background-position: center;
@@ -12,6 +22,10 @@ body {
   font-size: 10px;
   color: #080808;
   text-transform: uppercase;
+}
+
+#title {
+  color:white;
 }
 
 h1 {
@@ -37,7 +51,7 @@ h1 {
   margin:auto;
   display: flex;
   flex-wrap: wrap;
-  width: 1250px; /* Adjust the width as needed */
+  width: 1080px; /* Adjust the width as needed */
 }
 
 /* Define the player box style */
@@ -54,6 +68,7 @@ h1 {
   font-weight: bold;
   font-size: large;
   text-align: center;
+  border-radius: 25px;
 }
 
 form {
@@ -486,7 +501,7 @@ h6 {
   color: black;
 }
 
-.submit-input {
+.submit-input  {
   padding: 5px 10px;
   background-color: #007bff; /* Blue */
   color: #fff;
@@ -498,60 +513,149 @@ h6 {
   height:30px;
 }
 
-.submit-input:hover {
+#send-button {
+  background-color: #8dc6ff;
+  padding: 5px 10px;
+  color: #e4f1fe;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  height:30px;
+}
+
+.submit-input:hover  {
   background-color: #0069d9; /* Darker Blue on hover */
+}
+
+#send-button:hover {
+  background-color: #34495e;
 }
 
 #chat {
   position:absolute;
   border: 1px solid #ccc;
-  background-color: #f9f9f9;
+  background-color: #22313f;
   padding:10px;
-  width:500px;
-  height:500px;
-  min-width: 300px;
-  min-height: 300px;
+  min-width: 368px;
+  min-height: 800px;
+  width: 368px;
+  height: 800px;
   z-index: 1;
   font-size: large;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#chat > img {
+  width: 5%;
+  height:5%;
 }
 
 #chatContainer {
+  margin-top: 20px;
   height:30%;
   overflow-y: scroll;
+  border: 3px solid #8dc6ff; /* Add border styling */
+  border-radius: 4px; /* Add border radius for a softer look */
+  padding: 8px;
+  background-color: #34495e;
+  scrollbar-color: #8dc6ff #34495e; /* color of scrollbar */
+}
+
+#chat-messages {
+  color: #e4f1fe;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: medium;
+  line-height: 1.25em;
+  padding: 0 0 1em 0;
+  text-align: justify;
 }
 
 #chatbox {
-  height:20%;
-  margin-top: 5px;
-  margin-bottom:15px;
+  margin:5px;
+}
+
+.chat_desc {
+  text-align: center;
+  color:#e4f1fe;
+  margin:0;
+  text-decoration: underline;
+  font-weight: 100;
+  padding:5px;
 }
 
 #eventContainer {
-  height:30%;
+  height:50%;
   overflow-y: scroll;
-  border: 1px dotted blue;
+  scrollbar-color: #8dc6ff #34495e; /* color of scrollbar */
+  background-color: #34495e;
+  padding: 8px;
+  border: 3px solid #8dc6ff; /* Add border styling */
+  border-radius: 4px;
+}
+
+#gameEventChat {
+  font-family: "Times New Roman", Times, serif;
+  font-size: medium;
 }
 
 #msg-input {
   height:25px;
   margin-bottom: 5px;
+  background-color: #34495e;
+  color: #e4f1fe;
+}
+
+::placeholder {
+  color: #e4f1fe;
 }
 
 #dragHandle {
-  cursor: move;
-  background-color: #ddd;
-  padding: 5px;
+  position: absolute;
+  top:0;
+  left:0;
+  width:auto;
+  height: 30px;
+  width:30px;
+  background-color: #3498db;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
+  color: #fff;
   text-align: center;
+  cursor: move;
+  transition: background-color 0.3s ease;
+  border: 3px solid black;
+}
+
+#dragHandle > img {
+  width: 100%;
+  height: 100%;
+  margin:0;
 }
 
 #resizeHandle {
   width:auto;
-  height: 25px;
+  height:30px;
   background-color: #3498db;
   position: absolute;
-  bottom: 10px;
+  bottom: 0;
   right: 0;
   cursor: nwse-resize;
+  color: #fff;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+#resizeHandle > img {
+  width:100%;
+  height:100%;
+}
+
+#resizeHandle:hover, #dragHandle:hover {
+  background-color: #0069d9;
 }
 
 .message{color:blue;}
