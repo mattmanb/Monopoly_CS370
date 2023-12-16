@@ -565,7 +565,7 @@ h6 {
 
 #chat-messages {
   color: #e4f1fe;
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-family: sans-serif;
   font-size: medium;
   line-height: 1.25em;
   padding: 0 0 1em 0;
@@ -596,7 +596,7 @@ h6 {
 }
 
 #gameEventChat {
-  font-family: "Times New Roman", Times, serif;
+  font-family:sans-serif;
   font-size: medium;
 }
 
@@ -681,7 +681,7 @@ h6 {
 
 .modal-content {
   text-align: center;
-  font-family: 'Arial', sans-serif;
+  font-family: sans-serif;
   font-size: 16px;
   line-height: 1.5;
 }
